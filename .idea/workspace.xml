@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d4a22071-f89e-4a45-a0f6-f841d95d3030" name="Default Changelist" comment="" />
+    <list default="true" id="d4a22071-f89e-4a45-a0f6-f841d95d3030" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,7 +32,10 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="C:/Program Files/Git/bin/git.exe" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="project.structure.last.edited" value="Project" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="settings.editor.selected.configurable" value="preferences.fileTypes" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -44,7 +49,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.ServerAppMain">
+  <component name="RunManager" selected="Application.ClientAppMain">
     <configuration name="ClientAppMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.java.ClientAppMain" />
       <module name="Client_side" />
@@ -91,7 +96,17 @@
       <workItem from="1564584334192" duration="59000" />
       <workItem from="1564584396419" duration="316000" />
       <workItem from="1564584714652" duration="4000" />
+      <workItem from="1564584720047" duration="417000" />
+      <workItem from="1564585139892" duration="337000" />
     </task>
+    <task id="LOCAL-00001" summary="/// proba">
+      <created>1564584875062</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1564584875062</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,5 +124,9 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="/// proba" />
+    <option name="LAST_COMMIT_MESSAGE" value="/// proba" />
   </component>
 </project>
