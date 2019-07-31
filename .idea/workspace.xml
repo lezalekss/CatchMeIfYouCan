@@ -1,41 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7d89f8ff-7614-4440-80b8-34c53bd51368" name="Default Changelist" comment="" />
+    <list default="true" id="d4a22071-f89e-4a45-a0f6-f841d95d3030" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="MavenImportPreferences">
     <option name="importingSettings">
       <MavenImportingSettings>
-        <option name="importAutomatically" value="true" />
+        <option name="jdkForImporter" value="1.8" />
       </MavenImportingSettings>
     </option>
+    <option name="disabledProfiles">
+      <list>
+        <option value="mozzart" />
+      </list>
+    </option>
   </component>
-  <component name="ProjectId" id="1OlxA7m1IOeNU14lWXCGquW1rg2" />
+  <component name="ProjectId" id="1OmYeE02uraGW43WFs5bS03mMJJ" />
   <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="jdk.selected.JAVA_MODULE" value="1.8" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Client_side" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.2" />
-  </component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\aleksa.milenkovic\IdeaProjects\CatchMeIfYouCan\Client_side\src\main\resources\view" />
-    </key>
+    <property name="last_opened_file_path" value="C:/Program Files/Git/bin/git.exe" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -49,13 +44,13 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.ClientAppMain">
+  <component name="RunManager" selected="Application.ServerAppMain">
     <configuration name="ClientAppMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="main.java.ClientAppMain" />
       <module name="Client_side" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="main.com.rmt.java.*" />
+          <option name="PATTERN" value="main.java.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -66,14 +61,16 @@
     <configuration name="ServerAppMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.rmt.ServerAppMain" />
       <module name="Server_side" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.rmt.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <list>
-      <item itemvalue="Application.ClientAppMain" />
-      <item itemvalue="Application.ServerAppMain" />
-    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Application.ServerAppMain" />
@@ -86,16 +83,31 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="7d89f8ff-7614-4440-80b8-34c53bd51368" name="Default Changelist" comment="" />
-      <created>1564565837427</created>
+      <changelist id="d4a22071-f89e-4a45-a0f6-f841d95d3030" name="Default Changelist" comment="" />
+      <created>1564584331865</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1564565837427</updated>
-      <workItem from="1564565841431" duration="3715000" />
+      <updated>1564584331865</updated>
+      <workItem from="1564584334192" duration="59000" />
+      <workItem from="1564584396419" duration="316000" />
+      <workItem from="1564584714652" duration="4000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>
