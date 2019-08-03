@@ -1,0 +1,14 @@
+* {
+  -fx-primary: #0d3e5e;
+  -fx-secondary: rgb(0, 166, 231);
+  -fx-primary-text: #b2b2b2
+}
+
+
+.start-button{
+    -fx-border-color: -fx-secondary;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -jfx-button-type: RAISED;
+    -fx-font-size: 30px;
+}
