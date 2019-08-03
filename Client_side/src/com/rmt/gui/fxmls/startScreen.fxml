@@ -7,17 +7,36 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.geometry.Insets?>
-<VBox alignment="CENTER" stylesheets="" xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.rmt.gui.controllers.StartScreen"
-      prefHeight="400.0" prefWidth="600.0">
-<padding>
-    <Insets top="20" right="20" bottom="20" left="20"/>
-</padding>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import com.jfoenix.controls.JFXButton?>
+<GridPane alignment="CENTER" gridLinesVisible="true" stylesheets="@../style/test-theme.css" xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.rmt.gui.controllers.StartScreen"
+          prefHeight="400.0" prefWidth="600.0">
+    <!--<VBox.margin>-->
+    <!--<Insets top="5" right="5" left="5" bottom="5"/>-->
+    <!--</VBox.margin>-->
+
+    <columnConstraints>
+        <ColumnConstraints halignment="CENTER" percentWidth="50"/>
+    </columnConstraints>
+
+    <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="0" GridPane.columnIndex="0"
+               GridPane.columnSpan="2">
+        <!--#TODO stavi logo-->
+        <!--<image>-->
+            <!--<Image/>-->
+        <!--</image>-->
+    </ImageView>
+
+    <!--<padding>-->
+        <!--<Insets top="20" right="20" bottom="20" left="20"/>-->
+    <!--</padding>-->
+
+    <!--#TODO Add style class for start buttons-->
+    <JFXButton fx:id="connectButton" styleClass="start-button" text="CONNECT" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <JFXButton fx:id="quitButton" styleClass="start-button" text="QUIT" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
 
 
-
-
-
-
-</VBox>
+</GridPane>

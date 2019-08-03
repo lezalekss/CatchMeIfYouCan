@@ -10,8 +10,8 @@ public class ClientAppMain extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/main/resources/view/sample.fxml"));
-        primaryStage.setTitle("Hello World");
+        Parent root = FXMLLoader.load(getClass().getResource("/com/rmt/gui/fxmls/startScreen.fxml"));
+        primaryStage.setTitle("Catch me if you can");
         primaryStage.setScene(new Scene(root, 300, 275));
         primaryStage.show();
     }
