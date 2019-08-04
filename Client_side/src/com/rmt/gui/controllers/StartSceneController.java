@@ -1,15 +1,10 @@
 package com.rmt.gui.controllers;
 
-import com.jfoenix.controls.JFXButton;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
