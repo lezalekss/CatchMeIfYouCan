@@ -26,7 +26,7 @@ public class StartSceneController implements Initializable {
         try {
             boolean connectionSuccessful = this.communicationService.connect();
             if(connectionSuccessful){
-              this.stageService.changeScene("gui/fxmls/login.fxml", event);
+              this.stageService.changeScene("com/rmt/gui/fxmls/login.fxml", event);
             } else {
                 Alert error = new Alert(Alert.AlertType.ERROR);
                 error.setTitle("Neuspesno povezivanje");
