@@ -13,6 +13,8 @@ public class CommunicationService {
     private BufferedReader serverInput = null;
     private PrintStream serverOutput = null;
 
+    private CommunicationService(){}
+
     public static CommunicationService getCommunicationServiceInstance() {
         if (serviceInstance == null) {
             serviceInstance = new CommunicationService();
@@ -21,7 +23,7 @@ public class CommunicationService {
     }
 
     public boolean connect() throws IOException {
-        this.communicationSocket = new Socket("localhost", 30000);
+        this.communicationSocket = new Socket("localhost", 5000);
         this.serverInput = new BufferedReader(new InputStreamReader(this.communicationSocket.getInputStream()));
         this.serverOutput = new PrintStream(this.communicationSocket.getOutputStream());
         return testConnection();

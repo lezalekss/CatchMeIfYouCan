@@ -22,7 +22,7 @@ public class StageService {
     }
 
     public void changeScene(String newScene, ActionEvent event) throws IOException {
-        Parent parent = FXMLLoader.load(getClass().getClassLoader().getResource(newScene));
+        Parent parent = FXMLLoader.load(getClass().getResource(newScene));
         Stage currentScene = (Stage) ((Node)(event.getSource())).getScene().getWindow();
 
         currentScene.getScene().setRoot(parent);
