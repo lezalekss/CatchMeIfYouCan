@@ -6,9 +6,39 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.rmt.gui.controllers.LoginController"
-            prefHeight="400.0" prefWidth="600.0">
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<?import com.jfoenix.controls.JFXTextField?>
+<GridPane xmlns="http://javafx.com/javafx" gridLinesVisible="true"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.rmt.gui.controllers.LoginController"
+          prefHeight="400.0" prefWidth="600.0" vgap="20">
 
-</AnchorPane>
+    <columnConstraints>
+        <ColumnConstraints halignment="CENTER" percentWidth="50"/>
+    </columnConstraints>
+
+    <rowConstraints>
+        <RowConstraints valignment="CENTER" percentHeight="40"/>
+        <RowConstraints valignment="CENTER" percentHeight="10"/>
+        <RowConstraints valignment="CENTER" percentHeight="10"/>
+        <RowConstraints valignment="CENTER" percentHeight="10"/>
+        <RowConstraints valignment="CENTER" percentHeight="10"/>
+        <RowConstraints valignment="TOP" percentHeight="20"/>
+    </rowConstraints>
+
+    <ImageView GridPane.rowIndex="0" GridPane.columnIndex="0">
+<!--        #TODO Add logo-->
+<!--        <image>-->
+<!--            <Image/>-->
+<!--        </image>-->
+    </ImageView>
+
+    <Label text="Username:" textAlignment="CENTER" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+    <JFXTextField fx:id="username" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <Label text="Password" textAlignment="CENTER" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+    <JFXTextField fx:id="password" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+
+
+
+</GridPane>

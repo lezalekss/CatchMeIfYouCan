@@ -1,11 +1,15 @@
 package com.rmt.gui.controllers;
 
+import com.jfoenix.controls.JFXButton;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,6 +19,8 @@ public class StartSceneController implements Initializable {
 
     private CommunicationService communicationService;
     private StageService stageService;
+
+//    @FXML JFXButton quitButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -39,5 +45,11 @@ public class StartSceneController implements Initializable {
             error.setContentText("Dogodila se greska prilikom uspostavljanja veze sa serverom. Pokusajte ponovo.");
             error.showAndWait();
         }
+    }
+
+    public void onQuitButtonClicked(ActionEvent event){
+//        Stage currentScene = (Stage) ((Node)(event.getSource())).getScene().getWindow();
+//        Stage currentScene = (Stage) (this.quitButton).getScene().getWindow();
+        this.stageService.quit(event);
     }
 }

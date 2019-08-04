@@ -28,4 +28,10 @@ public class StageService {
         currentScene.getScene().setRoot(parent);
         currentScene.show();
     }
+
+    public void quit(ActionEvent event){
+        Stage currentScene = (Stage) ((Node)(event.getSource())).getScene().getWindow();
+        currentScene.close();
+    }
+
 }

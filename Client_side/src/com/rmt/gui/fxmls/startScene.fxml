@@ -42,7 +42,7 @@
 
     <!--#TODO Add style class for start buttons-->
     <JFXButton fx:id="connectButton" onAction="#onConnectButtonClicked" styleClass="start-button" text="CONNECT" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-    <JFXButton fx:id="quitButton" styleClass="start-button" text="QUIT" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <JFXButton fx:id="quitButton" onAction="#onQuitButtonClicked" styleClass="start-button" text="QUIT" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
 
 </GridPane>
