@@ -37,6 +37,7 @@ public class StartSceneController implements Initializable {
         } catch (IOException e) {
             Alert error = new Alert(Alert.AlertType.ERROR);
             error.setTitle("Greska prilikom povezivanja");
+//          #TODO wrap the content text
             error.setContentText("Dogodila se greska prilikom uspostavljanja veze sa serverom. Pokusajte ponovo.");
             error.showAndWait();
         }

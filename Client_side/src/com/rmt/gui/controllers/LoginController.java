@@ -23,4 +23,8 @@ public class LoginController implements Initializable {
     public void onBackButtonClicked(ActionEvent event) throws IOException {
         this.stageService.changeScene("com/rmt/gui/fxmls/startScene.fxml", event);
     }
+
+    public void onRegisterButtonClicked(ActionEvent event){
+
+    }
 }

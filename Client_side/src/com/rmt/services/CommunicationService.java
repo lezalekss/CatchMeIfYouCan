@@ -38,4 +38,28 @@ public class CommunicationService {
         return false;
     }
 
+    public boolean register(String username, String password) throws IOException {
+//      #TODO encript password before sending
+//      #TODO check whether username contains : or # before sending
+        this.serverOutput.println("200:Username#"+username+":Password#"+password);
+        String answer = this.serverInput.readLine();
+        if(answer.contains("201")) {
+            return true;
+        }else{
+//          #TODO find a way to pass the message extracted from answer to scene
+            return false;
+        }
+    }
+
+    public boolean login(String username, String password) throws IOException {
+//      #TODO check whether username contains : or # before sending
+        this.serverOutput.println("300:Username#"+username+":Password#"+password);
+        String answer = this.serverInput.readLine();
+        if(answer.contains("301")) {
+            return true;
+        }else{
+//          #TODO find a way to pass the message extracted from answer to scene
+            return false;
+        }
+    }
 }
