@@ -34,7 +34,7 @@ public class UserHandler extends Thread {
             DBConnection dbConn = new DBConnection();
             userOutput = new ObjectOutputStream(this.user.getSocket().getOutputStream());
             userInput = new ObjectInputStream(this.user.getSocket().getInputStream());
-            while() {
+            while(true) {
                 Message msg = (Message) userInput.readObject();
                 switch (msg.getType()) {
                     case LOGIN:

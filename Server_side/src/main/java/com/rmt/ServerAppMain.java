@@ -6,17 +6,17 @@ import com.rmt.domain.Player;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
 
 public class ServerAppMain {
     private static Map<String,Player> playersMap;
     private static final int port = 5000;
-    private static Logger logger = LoggerFactory.getLogger(ServerAppMain.class);
+    private static Logger logger = Logger.getLogger(ServerAppMain.class.getName());
 
     public static void main(String[] args) {
         playersMap = new HashMap<>();

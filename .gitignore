@@ -28,7 +28,6 @@ hs_err_pid*
 
 # Intellij
 .idea/
-*.iml
 *.ipr
 *.iws
 .idea_modules/

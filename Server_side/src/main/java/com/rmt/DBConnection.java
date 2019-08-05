@@ -1,14 +1,12 @@
 package com.rmt;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.*;
+import java.util.logging.Logger;
 
 public final class DBConnection {
     // connection with oracle for every user thread
     private Connection connection;
-    private Logger logger = LoggerFactory.getLogger(ServerAppMain.class);
+    private Logger logger = Logger.getLogger(ServerAppMain.class.getName());
     public DBConnection(){
         try{
             logger.info("Trying to setup connection with database");
