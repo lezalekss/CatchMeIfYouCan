@@ -1,0 +1,8 @@
+/* ovde cemo da pisemo sve oko dogovora za nas API tj komunikaciju izmedju klijenta i servera */
+
+[EDIT: Aleksa] 
+Ja sam postavio klasu Message pa sam mislio da ne saljemo stringove nego objekte te klase i na taj nacin da se vrsi komunikacija.
+Ideja je da obe strane imaju tu klasu (identicnu)
+Zavrsicu ovo za bazu jos nisam napravio tabelu i to, ali u sustini ovim metodama bismo mogli da pristupamo 
+(skolski ili da koristimo neki framework za bazu; mozemo i to da dodamo tipa MyBatis ili Hibernate, mada za ovako mali projekat nema potrebe)
+---------------------------------------------------------------------------------------------------------------------------------------------
