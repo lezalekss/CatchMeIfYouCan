@@ -6,32 +6,44 @@ import com.rmt.domain.Player;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ServerAppMain {
-    private static List<Player> players = null;
+    private static Map<String,Player> playersMap;
+    private static final int port = 5000;
+    private static Logger logger = LoggerFactory.getLogger(ServerAppMain.class);
 
     public static void main(String[] args) {
-        int port = 5000;
+        playersMap = new HashMap<>();
+
+
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server ceka na konekciju...");
+            logger.info("Server is waiting for client");
 
             while (true) {
                 Socket communicationSocket = serverSocket.accept();
                 UserHandler user = new UserHandler(communicationSocket);
                 user.start();
+                logger.info("Client connected");
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static List<Player> getPlayers() {
-        if (players == null){
-            players= new LinkedList<>();
-        }
-        return players;
+    public static synchronized  List<Player> getOnlinePlayers() {
+        return playersMap.values().stream().collect(Collectors.toList());
+    }
+    public static synchronized void addToActivePlayers(Player player) {
+        playersMap.put(player.getUsername(),player);
+    }
+    public static synchronized Socket findSocket(String username){
+        return playersMap.get(username).getSocket();
     }
 }

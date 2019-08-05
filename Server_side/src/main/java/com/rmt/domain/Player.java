@@ -4,12 +4,14 @@ import java.net.Socket;
 
 public class Player {
 
-    public enum PlayerStatus{ACTIVE, PLAYING}
+    public enum PlayerStatus{ACTIVE, PLAYING,OFFLINE}
 
 
     private Socket socket;
     private String username;
     private PlayerStatus status;
+
+    public Player(Socket socket){this.socket=socket;}
 
     public Player(Socket socket, String username, PlayerStatus status) {
         this.socket = socket;
@@ -41,4 +43,3 @@ public class Player {
         this.status = status;
     }
 }
-
