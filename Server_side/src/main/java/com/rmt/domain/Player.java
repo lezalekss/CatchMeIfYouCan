@@ -1,45 +1,23 @@
 package com.rmt.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.net.Socket;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Player {
 
     public enum PlayerStatus{ACTIVE, PLAYING,OFFLINE}
-
 
     private Socket socket;
     private String username;
     private PlayerStatus status;
 
-    public Player(Socket socket){this.socket=socket;}
-
-    public Player(Socket socket, String username, PlayerStatus status) {
-        this.socket = socket;
-        this.username = username;
-        this.status = status;
-    }
-
-    public Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public PlayerStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(PlayerStatus status) {
-        this.status = status;
+    public Player(Socket socket){
+        this.socket=socket;
     }
 }
