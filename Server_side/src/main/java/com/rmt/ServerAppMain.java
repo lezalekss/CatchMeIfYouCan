@@ -21,8 +21,6 @@ public class ServerAppMain {
     public static void main(String[] args) {
         playersMap = new HashMap<>();
 
-
-
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             logger.info("Server is waiting for client");
 

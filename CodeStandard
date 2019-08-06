@@ -6,3 +6,15 @@ Ideja je da obe strane imaju tu klasu (identicnu)
 Zavrsicu ovo za bazu jos nisam napravio tabelu i to, ali u sustini ovim metodama bismo mogli da pristupamo 
 (skolski ili da koristimo neki framework za bazu; mozemo i to da dodamo tipa MyBatis ili Hibernate, mada za ovako mali projekat nema potrebe)
 ---------------------------------------------------------------------------------------------------------------------------------------------
+
+CREATE SEQUENCE user_seq START WITH 1;
+
+CREATE TABLE users (
+  id           NUMBER(10)    DEFAULT user_seq.nextval NOT NULL,
+  username  VARCHAR2(50)  NOT NULL,
+  userpass varchar(50) not null);
+
+ALTER TABLE users ADD (
+  CONSTRAINT dept_pk PRIMARY KEY (ID));
+
+  alter table users add constraint un_user unique(username);

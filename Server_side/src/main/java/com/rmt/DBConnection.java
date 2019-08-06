@@ -10,9 +10,9 @@ public final class DBConnection {
     public DBConnection(){
         try{
             logger.info("Trying to setup connection with database");
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("oracle.jdbc.driver.OracleDriver");
             connection= DriverManager.getConnection(
-                    "jdbc:mysql://localhost/catchmeifyoucandatabase", "root", "");
+                    "jdbc:oracle:thin:@//localhost:1521/xepdb1", "catchmeifyoucan", "catchmeifyoucan!");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
@@ -22,7 +22,7 @@ public final class DBConnection {
     public void insertIntoDatabase(String user, String pass){
         try{
             Statement stmt = (Statement)connection.createStatement();
-            stmt.execute("INSERT INTO `users`(`Username`, `Password`) VALUES ('"+user+"','"+pass+"')");
+            stmt.execute("INSERT INTO users(username, userpass) VALUES ('"+user+"','"+pass+"')");
             stmt.close();
         }catch (SQLException e){
             e.printStackTrace();
@@ -32,7 +32,7 @@ public final class DBConnection {
     public boolean isRegistered(String user){
         try{
             Statement stmt = (Statement)connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT Username FROM user");
+            ResultSet rs = stmt.executeQuery("SELECT username FROM users");
 
             while (rs.next())
                 if(user.equals(rs.getString(1)))
@@ -48,7 +48,7 @@ public final class DBConnection {
     public boolean isRegistered(String user, String pass){
         try{
             Statement stmt = (Statement)connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT Password FROM user WHERE Username='"+user+"' ");
+            ResultSet rs = stmt.executeQuery("SELECT userpass FROM users WHERE username='"+user+"' ");
             while (rs.next())
                 if(pass.equals(rs.getString(1)))
                     return true;
