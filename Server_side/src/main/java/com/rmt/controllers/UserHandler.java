@@ -23,7 +23,7 @@ public class UserHandler extends Thread {
 
     private ObjectInputStream opponentInput;
     private ObjectOutputStream opponentOutput;
-
+    private DBConnection dbConn;
 
     public UserHandler(Socket socket) {
         user = new Player(socket);
@@ -31,25 +31,22 @@ public class UserHandler extends Thread {
 
     public void run() {
         try {
-            DBConnection dbConn = new DBConnection();
+            dbConn = new DBConnection();
             userOutput = new ObjectOutputStream(this.user.getSocket().getOutputStream());
             userInput = new ObjectInputStream(this.user.getSocket().getInputStream());
             while(true) {
                 Message msg = (Message) userInput.readObject();
                 switch (msg.getType()) {
                     case LOGIN:
-                        login();
+                        login(msg);
                         break;
                     case REGISTER:
-                        register();
+                        register(msg);
                         break;
                     default:
                         throwError("Unexpected error");
                         break;
                 }
-                //   addToActivePlayers();
-                //   showActivePlayers();
-                //  receiveDecision();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,12 +55,28 @@ public class UserHandler extends Thread {
         }
     }
 
-    private void login() throws IOException {
+    private void login(Message msg)  {
+        Message answer = new Message();
+        answer.setType(Message.MessageType.LOGIN);
+        String []userAndPass = msg.getMessageText().split("#");
+        if(!dbConn.isRegistered(userAndPass[0],userAndPass[1]))
+            inGameScene(userAndPass[0], userAndPass[1]);
+        else throwError(String.format("User with name:%s and pass:%s does not exist",userAndPass[0],userAndPass[1]));
+    }
+    private void register(Message msg) {
+        Message answer = new Message();
+        answer.setType(Message.MessageType.REGISTER);
+        String []userAndPass = msg.getMessageText().split("#");
+        if(!dbConn.isRegistered(userAndPass[0])){
+            dbConn.insertIntoDatabase(userAndPass[0],userAndPass[1]);
+            inGameScene(userAndPass[0], userAndPass[1]);
+        }
+       else throwError(String.format("User with name:%s is already registered",userAndPass[0]));
+    }
+    private void inGameScene(String username, String pass){
 
     }
-    private void register() {
 
-    }
     private void throwError(String errorMsg){
         Message errorMessage = new Message();
         errorMessage.setMessageText(errorMsg);
