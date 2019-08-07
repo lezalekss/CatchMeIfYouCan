@@ -1,14 +1,12 @@
 package com.rmt.controllers;
 import com.rmt.DBConnection;
-import com.rmt.Message;
+import com.rmt.domain.Message;
 import com.rmt.ServerAppMain;
 import com.rmt.domain.Player;
-import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintStream;
 import java.net.Socket;
 import java.util.List;
 
@@ -34,17 +32,19 @@ public class UserHandler extends Thread {
             dbConn = new DBConnection();
             userOutput = new ObjectOutputStream(this.user.getSocket().getOutputStream());
             userInput = new ObjectInputStream(this.user.getSocket().getInputStream());
+
             while(true) {
                 Message msg = (Message) userInput.readObject();
+
                 switch (msg.getType()) {
                     case LOGIN:
-                        login(msg);
+                        this.login(msg);
                         break;
                     case REGISTER:
-                        register(msg);
+                        this.register(msg);
                         break;
                     default:
-                        throwError("Unexpected error");
+                        this.sendError("Unexpected error");
                         break;
                 }
             }
@@ -55,37 +55,44 @@ public class UserHandler extends Thread {
         }
     }
 
-    private void login(Message msg)  {
-        Message answer = new Message();
-        answer.setType(Message.MessageType.LOGIN);
+    private void login(Message msg) throws IOException {
         String []userAndPass = msg.getMessageText().split("#");
-        if(!dbConn.isRegistered(userAndPass[0],userAndPass[1]))
+        if(dbConn.isRegistered(userAndPass[0]) == false){
+            this.sendError("Username does not exist.");
+            return;
+        } else if(dbConn.isPasswordCorrect(userAndPass[0], userAndPass[1]) == false){
+            this.sendError("Incorrect password.");
+            return;
+        }
+            this.sendAnswer("OK");
             inGameScene(userAndPass[0], userAndPass[1]);
-        else throwError(String.format("User with name:%s and pass:%s does not exist",userAndPass[0],userAndPass[1]));
     }
-    private void register(Message msg) {
-        Message answer = new Message();
-        answer.setType(Message.MessageType.REGISTER);
+
+    private void register(Message msg) throws IOException {
         String []userAndPass = msg.getMessageText().split("#");
-        if(!dbConn.isRegistered(userAndPass[0])){
+        if(dbConn.isRegistered(userAndPass[0])){
+            this.sendError("Username already taken.");
+            return;
+        }
+            this.sendAnswer("OK");
             dbConn.insertIntoDatabase(userAndPass[0],userAndPass[1]);
             inGameScene(userAndPass[0], userAndPass[1]);
-        }
-       else throwError(String.format("User with name:%s is already registered",userAndPass[0]));
+
     }
     private void inGameScene(String username, String pass){
 
     }
 
-    private void throwError(String errorMsg){
-        Message errorMessage = new Message();
-        errorMessage.setMessageText(errorMsg);
-        try {
-            this.userOutput.writeObject(errorMessage);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void sendError(String messageText) throws IOException {
+        Message errorMessage = new Message(Message.MessageType.ERROR, messageText);
+        this.userOutput.writeObject(errorMessage);
     }
+
+    private void sendAnswer(String messageText) throws IOException {
+        Message answer = new Message(Message.MessageType.ANSWERS, messageText);
+        this.userOutput.writeObject(answer);
+    }
+
 
     private Socket findSocket(String username) {
        return ServerAppMain.findSocket(username);

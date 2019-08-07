@@ -29,35 +29,32 @@ public final class DBConnection {
         }
     }
 
-    public boolean isRegistered(String user){
+    public boolean isRegistered(String username){
         try{
             Statement stmt = (Statement)connection.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT username FROM users");
 
             while (rs.next())
-                if(user.equals(rs.getString(1)))
+                if(username.equals(rs.getString(1)))
                     return true;
-
             stmt.close();
         }catch(SQLException e){
             e.printStackTrace();
         }
-
         return false;
     }
-    public boolean isRegistered(String user, String pass){
+
+    public boolean isPasswordCorrect(String username, String password){
         try{
             Statement stmt = (Statement)connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT userpass FROM users WHERE username='"+user+"' ");
+            ResultSet rs = stmt.executeQuery("SELECT userpass FROM users WHERE username='"+username+"' ");
             while (rs.next())
-                if(pass.equals(rs.getString(1)))
+                if(password.equals(rs.getString(1)))
                     return true;
-
             stmt.close();
         }catch(SQLException e){
             e.printStackTrace();
         }
-
         return false;
     }
 }

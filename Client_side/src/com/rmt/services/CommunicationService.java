@@ -1,17 +1,17 @@
 package com.rmt.services;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import com.rmt.domain.Message;
+
+import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class CommunicationService {
 
     private static CommunicationService serviceInstance = null;
     private Socket communicationSocket = null;
-    private BufferedReader serverInput = null;
-    private PrintStream serverOutput = null;
+    private ObjectInputStream serverInput = null;
+    private ObjectOutputStream serverOutput = null;
 
     private CommunicationService(){}
 
@@ -22,44 +22,56 @@ public class CommunicationService {
         return serviceInstance;
     }
 
-    public boolean connect() throws IOException {
-        this.communicationSocket = new Socket("localhost", 5000);
-        this.serverInput = new BufferedReader(new InputStreamReader(this.communicationSocket.getInputStream()));
-        this.serverOutput = new PrintStream(this.communicationSocket.getOutputStream());
-        return testConnection();
-    }
-
-    private boolean testConnection() throws IOException {
-        this.serverOutput.println("100:Checking connection");
-        String answer = this.serverInput.readLine();
-        if (answer.contains("101")) {
-            return true;
+    public boolean connect(){
+        try {
+            this.communicationSocket = new Socket("localhost", 5000);
+            this.serverInput = new ObjectInputStream(this.communicationSocket.getInputStream());
+            this.serverOutput = new ObjectOutputStream(this.communicationSocket.getOutputStream());
+        }catch(UnknownHostException e){
+            return false;
+        }catch(IOException e1){
+            return false;
         }
-        return false;
+        return true;
     }
 
-    public boolean register(String username, String password) throws IOException {
+     public boolean register(String username, String password) {
 //      #TODO encript password before sending
+         try {
+             this.sendMessage(Message.MessageType.REGISTER, username + "#" + password);
+             Message answer = (Message) this.serverInput.readObject();
+             switch (answer.getType()) {
+                 case ANSWERS: {
+                     return true;
+                 }
+                 case ERROR: {
+                     return false;
+                 }
+             }
+         } catch (ClassNotFoundException e) {
+             return false;
+         } catch (IOException e1){
+             return false;
+         }
+         return false;
+     }
+
+    public String login(String username, String password) {
 //      #TODO check whether username contains : or # before sending
-        this.serverOutput.println("200:Username#"+username+":Password#"+password);
-        String answer = this.serverInput.readLine();
-        if(answer.contains("201")) {
-            return true;
-        }else{
-//          #TODO find a way to pass the message extracted from answer to scene
-            return false;
+        try {
+            this.sendMessage(Message.MessageType.LOGIN,username+"#"+password);
+            Message answer = (Message) this.serverInput.readObject();
+            return answer.getMessageText();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
-    public boolean login(String username, String password) throws IOException {
-//      #TODO check whether username contains : or # before sending
-        this.serverOutput.println("300:Username#"+username+":Password#"+password);
-        String answer = this.serverInput.readLine();
-        if(answer.contains("301")) {
-            return true;
-        }else{
-//          #TODO find a way to pass the message extracted from answer to scene
-            return false;
-        }
+    private void sendMessage(Message.MessageType messageType, String messageText) throws IOException {
+        Message message = new Message(messageType, messageText);
+        this.serverOutput.writeObject(message);
     }
 }

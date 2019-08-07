@@ -1,9 +1,12 @@
 package com.rmt.gui.controllers;
 
+import com.jfoenix.controls.JFXTextField;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,6 +16,12 @@ public class LoginController implements Initializable {
 
     private StageService stageService;
     private CommunicationService communicationService;
+
+    @FXML
+    JFXTextField username;
+    @FXML
+    JFXTextField password;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -25,6 +34,40 @@ public class LoginController implements Initializable {
     }
 
     public void onRegisterButtonClicked(ActionEvent event){
-
+        String username = this.username.getText();
+        String password = this.password.getText();
+        boolean registrationSuccessful = this.communicationService.register(username, password);
+        if(registrationSuccessful){
+            try {
+                this.stageService.changeScene("com/rmt/gui/fxmls/activePlayersScene.fxml", event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Registration failed");
+            alert.setContentText("Username already exists.");
+            alert.showAndWait();
+        }
     }
+
+    public void onLoginButtonClicked(ActionEvent event){
+        String username = this.username.getText();
+        String password = this.password.getText();
+        String answer = this.communicationService.login(username, password);
+        if(answer.equals("OK")){
+            try {
+                this.stageService.changeScene("com/rmt/gui/fxmls/activePlayersScene.fxml", event);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Login failed");
+            alert.setContentText(answer);
+            alert.showAndWait();
+        }
+    }
+
+
 }

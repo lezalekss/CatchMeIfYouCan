@@ -42,8 +42,8 @@
     <Label styleClass="credential-label" text="Password" textAlignment="CENTER" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
     <JFXTextField fx:id="password" alignment="CENTER" styleClass="credential-field" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
     <HBox alignment="CENTER" GridPane.rowIndex="5" GridPane.columnIndex="0">
-        <JFXButton fx:id="loginButton" styleClass="start-button" text="LOGIN"/>
-        <JFXButton fx:id="registerButton" styleClass="start-button" text="REGISTER"/>
+        <JFXButton fx:id="loginButton" onAction="#onLoginButtonClicked" styleClass="start-button" text="LOGIN"/>
+        <JFXButton fx:id="registerButton" onAction="#onRegisterButtonClicked" styleClass="start-button" text="REGISTER"/>
         <JFXButton fx:id="backButton" onAction="#onBackButtonClicked" styleClass="start-button" text="BACK"/>
     </HBox>
 
