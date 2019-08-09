@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class UserHandler extends Thread {
@@ -48,9 +50,11 @@ public class UserHandler extends Thread {
                         break;
                 }
             }
-        } catch (IOException e) {
+        }catch (SocketException e) {
+            e.printStackTrace(); // client shuts down
+        }catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        }catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -65,7 +69,7 @@ public class UserHandler extends Thread {
             return;
         }
             this.sendAnswer("OK");
-            inGameScene(userAndPass[0], userAndPass[1]);
+            inGameScene(userAndPass[0]);
     }
 
     private void register(Message msg) throws IOException {
@@ -76,11 +80,22 @@ public class UserHandler extends Thread {
         }
             this.sendAnswer("OK");
             dbConn.insertIntoDatabase(userAndPass[0],userAndPass[1]);
-            inGameScene(userAndPass[0], userAndPass[1]);
+            inGameScene(userAndPass[0]);
 
     }
-    private void inGameScene(String username, String pass){
+    private void inGameScene(String username){
+        List<String> onlinePlayers = ServerAppMain.getOnlinePlayers().stream().map(Player::getUsername).collect(Collectors.toList());
+        user.setStatus(Player.PlayerStatus.ACTIVE);
+        user.setUsername(username);
+        try {
+            userOutput.writeObject(onlinePlayers);
+            Message msg = (Message)userInput.readObject(); // U OVOJ PORUCI CE BITI USER SA KOJIM HOCE DA SE POVEZE
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendError(String messageText) throws IOException {
