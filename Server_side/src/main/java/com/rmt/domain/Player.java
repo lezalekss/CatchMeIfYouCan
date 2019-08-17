@@ -11,7 +11,7 @@ import java.net.Socket;
 @AllArgsConstructor
 public class Player {
 
-    public enum PlayerStatus{ACTIVE, PLAYING,OFFLINE}
+    public enum PlayerStatus{ACTIVE, PLAYING, OFFLINE}
 
     private Socket socket;
     private String username;

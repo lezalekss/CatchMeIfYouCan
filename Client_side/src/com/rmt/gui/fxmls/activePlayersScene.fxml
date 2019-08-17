@@ -6,9 +6,26 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.rmt.gui.controllers.ActivePlayersController"
-            prefHeight="400.0" prefWidth="600.0">
+<?import com.sun.javafx.scene.control.skin.TableHeaderRow?>
+<?import com.jfoenix.controls.JFXListView?>
+<GridPane xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.rmt.gui.controllers.ActivePlayersController"
+          alignment="CENTER" gridLinesVisible="true"
+          stylesheets="@../style/test-theme.css"
+          prefHeight="400.0" prefWidth="600.0">
 
-</AnchorPane>
+    <columnConstraints>
+        <ColumnConstraints percentWidth="40" halignment="CENTER"/>
+    </columnConstraints>
+
+    <rowConstraints>
+        <RowConstraints percentHeight="60" valignment="CENTER"/>
+    </rowConstraints>
+
+    <JFXListView fx:id = "activePlayersListView" GridPane.rowIndex="0" GridPane.columnIndex="0" >
+
+    </JFXListView>
+
+
+</GridPane>

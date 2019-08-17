@@ -1,4 +1,5 @@
 package com.rmt.controllers;
+
 import com.rmt.DBConnection;
 import com.rmt.domain.Message;
 import com.rmt.ServerAppMain;
@@ -8,7 +9,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class UserHandler extends Thread {
@@ -33,7 +35,7 @@ public class UserHandler extends Thread {
             userOutput = new ObjectOutputStream(this.user.getSocket().getOutputStream());
             userInput = new ObjectInputStream(this.user.getSocket().getInputStream());
 
-            while(true) {
+            while (true) {
                 Message msg = (Message) userInput.readObject();
 
                 switch (msg.getType()) {
@@ -43,6 +45,8 @@ public class UserHandler extends Thread {
                     case REGISTER:
                         this.register(msg);
                         break;
+                    case GET_ACTIVE:
+                        this.sendActivePlayers();
                     default:
                         this.sendError("Unexpected error");
                         break;
@@ -55,31 +59,45 @@ public class UserHandler extends Thread {
         }
     }
 
+    private void sendActivePlayers() throws IOException {
+        Set<String> activePlayers = ServerAppMain.getOnlinePlayers();
+        HashSet<String> players = new HashSet<>(activePlayers);
+        players.remove(user.getUsername());
+        this.userOutput.writeObject(players);
+    }
+
     private void login(Message msg) throws IOException {
-        String []userAndPass = msg.getMessageText().split("#");
-        if(dbConn.isRegistered(userAndPass[0]) == false){
+        String[] userAndPass = msg.getMessageText().split("#");
+        if (dbConn.isRegistered(userAndPass[0]) == false) {
             this.sendError("Username does not exist.");
             return;
-        } else if(dbConn.isPasswordCorrect(userAndPass[0], userAndPass[1]) == false){
+        } else if (dbConn.isPasswordCorrect(userAndPass[0], userAndPass[1]) == false) {
             this.sendError("Incorrect password.");
             return;
         }
-            this.sendAnswer("OK");
-            inGameScene(userAndPass[0], userAndPass[1]);
+        this.sendAnswer("OK");
+        user.setUsername(userAndPass[0]);
+        user.setStatus(Player.PlayerStatus.ACTIVE);
+        ServerAppMain.addToActivePlayers(user);
+        //inGameScene(userAndPass[0], userAndPass[1]);
     }
 
     private void register(Message msg) throws IOException {
-        String []userAndPass = msg.getMessageText().split("#");
-        if(dbConn.isRegistered(userAndPass[0])){
+        String[] userAndPass = msg.getMessageText().split("#");
+        if (dbConn.isRegistered(userAndPass[0])) {
             this.sendError("Username already taken.");
             return;
         }
-            this.sendAnswer("OK");
-            dbConn.insertIntoDatabase(userAndPass[0],userAndPass[1]);
-            inGameScene(userAndPass[0], userAndPass[1]);
+        this.sendAnswer("OK");
+//        dbConn.insertIntoDatabase(userAndPass[0], userAndPass[1]);
+        user.setUsername(userAndPass[0]);
+        user.setStatus(Player.PlayerStatus.ACTIVE);
+        ServerAppMain.addToActivePlayers(user);
+        //inGameScene(userAndPass[0], userAndPass[1]);
 
     }
-    private void inGameScene(String username, String pass){
+
+    private void inGameScene(String username, String pass) {
 
     }
 
@@ -91,21 +109,6 @@ public class UserHandler extends Thread {
     private void sendAnswer(String messageText) throws IOException {
         Message answer = new Message(Message.MessageType.ANSWERS, messageText);
         this.userOutput.writeObject(answer);
-    }
-
-
-    private Socket findSocket(String username) {
-       return ServerAppMain.findSocket(username);
-    }
-
-    private void showActivePlayers() {
-        // this.hostOutput.println("Currently active players:");
-        List<Player> players = ServerAppMain.getOnlinePlayers();
-        for (Player player : players) {
-            if (player.getUsername() != this.user.getUsername()) {
-                //       this.hostOutput.println(player.getUsername());
-            }
-        }
     }
 
 }

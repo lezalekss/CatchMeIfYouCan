@@ -1,10 +1,12 @@
 package com.rmt.services;
 
 import com.rmt.domain.Message;
+import javafx.collections.ObservableSet;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Set;
 
 public class CommunicationService {
 
@@ -73,5 +75,18 @@ public class CommunicationService {
     private void sendMessage(Message.MessageType messageType, String messageText) throws IOException {
         Message message = new Message(messageType, messageText);
         this.serverOutput.writeObject(message);
+    }
+
+    public Set<String> getActivePlayers() {
+        try {
+            this.sendMessage(Message.MessageType.GET_ACTIVE, "");
+            Set<String> activePlayers = (Set<String>) this.serverInput.readObject();
+            return activePlayers;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
