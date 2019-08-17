@@ -11,7 +11,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
-
+import java.net.SocketException;
 
 public class UserHandler extends Thread {
 
@@ -52,9 +52,11 @@ public class UserHandler extends Thread {
                         break;
                 }
             }
-        } catch (IOException e) {
+        }catch (SocketException e) {
+            e.printStackTrace(); // client shuts down
+        }catch (ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
+        }catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -94,11 +96,19 @@ public class UserHandler extends Thread {
         user.setStatus(Player.PlayerStatus.ACTIVE);
         ServerAppMain.addToActivePlayers(user);
         //inGameScene(userAndPass[0], userAndPass[1]);
-
     }
-
-    private void inGameScene(String username, String pass) {
-
+    private void inGameScene(String username){
+//        List<String> onlinePlayers = ServerAppMain.getOnlinePlayers().stream().map(Player::getUsername).collect(Collectors.toList());
+//        user.setStatus(Player.PlayerStatus.ACTIVE);
+//        user.setUsername(username);
+//        try {
+//            userOutput.writeObject(onlinePlayers);
+//            Message msg = (Message)userInput.readObject(); // U OVOJ PORUCI CE BITI USER SA KOJIM HOCE DA SE POVEZE
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private void sendError(String messageText) throws IOException {
