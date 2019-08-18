@@ -8,6 +8,7 @@
 
 <?import com.sun.javafx.scene.control.skin.TableHeaderRow?>
 <?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXButton?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.rmt.gui.controllers.ActivePlayersController"
@@ -21,11 +22,16 @@
 
     <rowConstraints>
         <RowConstraints percentHeight="60" valignment="CENTER"/>
+        <RowConstraints percentHeight="10" valignment="CENTER"/>
     </rowConstraints>
 
     <JFXListView fx:id = "activePlayersListView" GridPane.rowIndex="0" GridPane.columnIndex="0" >
 
     </JFXListView>
+
+    <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="start-button" GridPane.rowIndex="1" GridPane.columnIndex="0">
+
+    </JFXButton>
 
 
 </GridPane>

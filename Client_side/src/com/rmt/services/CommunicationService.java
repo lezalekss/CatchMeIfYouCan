@@ -6,6 +6,7 @@ import javafx.collections.ObservableSet;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.Set;
 
 public class CommunicationService {
@@ -15,7 +16,10 @@ public class CommunicationService {
     private ObjectInputStream serverInput = null;
     private ObjectOutputStream serverOutput = null;
 
-    private CommunicationService(){}
+    private Thread updatePlayersThread;
+
+    private CommunicationService() {
+    }
 
     public static CommunicationService getCommunicationServiceInstance() {
         if (serviceInstance == null) {
@@ -24,44 +28,44 @@ public class CommunicationService {
         return serviceInstance;
     }
 
-    public boolean connect(){
+    public boolean connect() {
         try {
             this.communicationSocket = new Socket("localhost", 5000);
             this.serverInput = new ObjectInputStream(this.communicationSocket.getInputStream());
             this.serverOutput = new ObjectOutputStream(this.communicationSocket.getOutputStream());
-        }catch(UnknownHostException e){
+        } catch (UnknownHostException e) {
             return false;
-        }catch(IOException e1){
+        } catch (IOException e1) {
             return false;
         }
         return true;
     }
 
-     public boolean register(String username, String password) {
+    public boolean register(String username, String password) {
 //      #TODO encript password before sending
-         try {
-             this.sendMessage(Message.MessageType.REGISTER, username + "#" + password);
-             Message answer = (Message) this.serverInput.readObject();
-             switch (answer.getType()) {
-                 case ANSWERS: {
-                     return true;
-                 }
-                 case ERROR: {
-                     return false;
-                 }
-             }
-         } catch (ClassNotFoundException e) {
-             return false;
-         } catch (IOException e1){
-             return false;
-         }
-         return false;
-     }
+        try {
+            this.sendMessage(Message.MessageType.REGISTER, username + "#" + password);
+            Message answer = (Message) this.serverInput.readObject();
+            switch (answer.getType()) {
+                case ANSWERS: {
+                    return true;
+                }
+                case ERROR: {
+                    return false;
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            return false;
+        } catch (IOException e1) {
+            return false;
+        }
+        return false;
+    }
 
     public String login(String username, String password) {
 //      #TODO check whether username contains : or # before sending
         try {
-            this.sendMessage(Message.MessageType.LOGIN,username+"#"+password);
+            this.sendMessage(Message.MessageType.LOGIN, username + "#" + password);
             Message answer = (Message) this.serverInput.readObject();
             return answer.getMessageText();
         } catch (ClassNotFoundException e) {
@@ -80,13 +84,37 @@ public class CommunicationService {
     public Set<String> getActivePlayers() {
         try {
             this.sendMessage(Message.MessageType.GET_ACTIVE, "");
-            Set<String> activePlayers = (Set<String>) this.serverInput.readObject();
-            return activePlayers;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return this.forwardChangedPlayersList();
+    }
+
+    public Set<String> forwardChangedPlayersList() {
+        try {
+            return (Set<String>) this.serverInput.readObject();
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void challengeOpponent(String opponentUsername) {
+        try {
+            this.sendMessage(Message.MessageType.PLAY_WITH, opponentUsername);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updatePlayers(ObservableSet<String> activePlayersSet) {
+        updatePlayersThread = new UpdatePlayersThread(this.serverOutput, this.serverInput, activePlayersSet);
+        updatePlayersThread.start();
+    }
+
+    public void stopUpdating(){
+        this.updatePlayersThread.interrupt();
     }
 }

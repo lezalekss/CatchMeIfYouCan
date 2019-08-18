@@ -12,7 +12,7 @@ public class ClientAppMain extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/startScene.fxml"));
         primaryStage.setTitle("Catch me if you can");
-        primaryStage.setScene(new Scene(root, 1600, 800));
+        primaryStage.setScene(new Scene(root, 800, 600));
 //        primaryStage.setFullScreen(true);
         primaryStage.show();
     }

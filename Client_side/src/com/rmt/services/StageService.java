@@ -1,5 +1,6 @@
 package com.rmt.services;
 
+import com.rmt.gui.controllers.ActivePlayersController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -34,4 +35,10 @@ public class StageService {
         currentScene.close();
     }
 
+    public void changeToActivePlayersScene(ActionEvent event, String username) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/activePlayersScene.fxml"));
+        Stage currentStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+        currentStage.getScene().setRoot(loader.load());
+        ((ActivePlayersController)loader.getController()).setUsername(username);
+    }
 }

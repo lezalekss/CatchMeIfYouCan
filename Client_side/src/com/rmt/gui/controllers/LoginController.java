@@ -39,7 +39,8 @@ public class LoginController implements Initializable {
         boolean registrationSuccessful = this.communicationService.register(username, password);
         if(registrationSuccessful){
             try {
-                this.stageService.changeScene("com/rmt/gui/fxmls/activePlayersScene.fxml", event);
+                //this.stageService.changeScene("com/rmt/gui/fxmls/activePlayersScene.fxml", event);
+                this.stageService.changeToActivePlayersScene(event, username);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -57,7 +58,8 @@ public class LoginController implements Initializable {
         String answer = this.communicationService.login(username, password);
         if(answer.equals("OK")){
             try {
-                this.stageService.changeScene("com/rmt/gui/fxmls/activePlayersScene.fxml", event);
+                //this.stageService.changeScene("com/rmt/gui/fxmls/activePlayersScene.fxml", event);
+                this.stageService.changeToActivePlayersScene(event, username);
             } catch (IOException e) {
                 e.printStackTrace();
             }

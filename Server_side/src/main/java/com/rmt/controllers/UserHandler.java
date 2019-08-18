@@ -25,6 +25,8 @@ public class UserHandler extends Thread {
     private ObjectOutputStream opponentOutput;
     private DBConnection dbConn;
 
+    private Thread updatePlayers;
+
     public UserHandler(Socket socket) {
         user = new Player(socket);
     }
@@ -45,25 +47,57 @@ public class UserHandler extends Thread {
                     case REGISTER:
                         this.register(msg);
                         break;
-                    case GET_ACTIVE:
+                    case GET_ACTIVE: {
                         this.sendActivePlayers();
+                        this.updatePlayers();
+                        break;
+                    }
+                    case PLAY_WITH: {
+
+
+                    }
                     default:
                         this.sendError("Unexpected error");
                         break;
                 }
             }
-        }catch (SocketException e) {
-            e.printStackTrace(); // client shuts down
-        }catch (ClassNotFoundException e) {
+        } catch (java.io.EOFException e) {
+            //kad kliknem na x u klijentu iskoci ovo
+            ServerAppMain.removePlayerFromActive(user.getUsername());
+            System.out.println("Player " + user.getUsername()+" just exited");
+        } catch (SocketException e) {
+            //e.printStackTrace(); // client shuts down
+            ServerAppMain.removePlayerFromActive(this.user.getUsername());
+            System.out.println("Player " + user.getUsername()+" just exited");
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private void updatePlayers() throws IOException, ClassNotFoundException {
+        while (true) {
+            Message message = (Message) this.userInput.readObject();
+            switch (message.getType()) {
+                case GET_ACTIVE: {
+                    if (ServerAppMain.isMapChanged()){
+                        this.sendAnswer("OK");
+                        this.userOutput.writeObject(ServerAppMain.getOnlinePlayers());
+                    }
+                    else
+                        this.sendAnswer("NO CHANGES");
+                    break;
+                }
+                case STOP_UPDATE: {
+                    return;
+                }
+            }
+        }
+    }
+
     private void sendActivePlayers() throws IOException {
-        Set<String> activePlayers = ServerAppMain.getOnlinePlayers();
-        HashSet<String> players = new HashSet<>(activePlayers);
+        HashSet<String> players = ServerAppMain.getOnlinePlayers();
         players.remove(user.getUsername());
         this.userOutput.writeObject(players);
     }
@@ -95,9 +129,11 @@ public class UserHandler extends Thread {
         user.setUsername(userAndPass[0]);
         user.setStatus(Player.PlayerStatus.ACTIVE);
         ServerAppMain.addToActivePlayers(user);
+        System.out.println("UH: user added");
         //inGameScene(userAndPass[0], userAndPass[1]);
     }
-    private void inGameScene(String username){
+
+    private void inGameScene(String username) {
 //        List<String> onlinePlayers = ServerAppMain.getOnlinePlayers().stream().map(Player::getUsername).collect(Collectors.toList());
 //        user.setStatus(Player.PlayerStatus.ACTIVE);
 //        user.setUsername(username);
@@ -119,6 +155,11 @@ public class UserHandler extends Thread {
     private void sendAnswer(String messageText) throws IOException {
         Message answer = new Message(Message.MessageType.ANSWERS, messageText);
         this.userOutput.writeObject(answer);
+    }
+
+    private void sendMessage(Message.MessageType type, String text) throws IOException {
+        Message message = new Message(type, text);
+        this.userOutput.writeObject(message);
     }
 
 }

@@ -9,16 +9,13 @@ import javafx.collections.ObservableMap;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 
 public class ServerAppMain {
-    private static ObservableMap<String,Player> playersMap;
+    private static ObservableMap<String, Player> playersMap;
     private static boolean mapChanged = false;
     private static final int port = 5000;
     private static Logger logger = Logger.getLogger(ServerAppMain.class.getName());
@@ -26,9 +23,7 @@ public class ServerAppMain {
     public static void main(String[] args) {
         playersMap = FXCollections.observableMap(new HashMap());
 
-        playersMap.addListener((MapChangeListener<? super String, ? super Player>) change ->
-            mapChanged = true
-        );
+        //addPlayersChangedListener();
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             logger.info("Server is waiting for client");
@@ -44,18 +39,40 @@ public class ServerAppMain {
         }
     }
 
-    public static synchronized Set<String> getOnlinePlayers() {
+    private static void addPlayersChangedListener() {
+        playersMap.addListener((MapChangeListener<? super String, ? super Player>) change -> {
+                    mapChanged = true;
+                    logger.info("Map changed");
+                }
+        );
+    }
+
+    public static synchronized HashSet<String> getOnlinePlayers() {
         //return playersMap.values().stream().collect(Collectors.toList());
-        return playersMap.keySet();
+        HashSet<String> activePlayersUsernames = new HashSet<>(playersMap.keySet());
+        return activePlayersUsernames;
     }
+
     public static synchronized void addToActivePlayers(Player player) {
-        playersMap.put(player.getUsername(),player);
+        playersMap.put(player.getUsername(), player);
+        if (playersMap.size() == 1) {
+            addPlayersChangedListener();
+        }
     }
-    public static synchronized Socket findSocket(String username){
+
+    public static synchronized Socket findSocket(String username) {
         return playersMap.get(username).getSocket();
     }
 
-    public static synchronized boolean isMapChanged(){
+    public static synchronized boolean isMapChanged() {
         return mapChanged;
+    }
+
+    public static synchronized void removePlayerFromActive(String username) {
+        playersMap.remove(username);
+    }
+
+    public static synchronized void setMapChanged(boolean mapChanged) {
+            mapChanged = mapChanged;
     }
 }

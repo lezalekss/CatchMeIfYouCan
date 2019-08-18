@@ -14,6 +14,6 @@ public class Message implements Serializable {
     private String messageText;
 
     public enum MessageType{
-        LOGIN,REGISTER,ANSWERS,ERROR,GET_ACTIVE
+        LOGIN,REGISTER,ANSWERS,ERROR,GET_ACTIVE,PLAYERS_CHANGED,PLAY_WITH,STOP_UPDATE
     }
 }
