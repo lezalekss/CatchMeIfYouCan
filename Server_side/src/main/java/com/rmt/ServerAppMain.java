@@ -19,6 +19,8 @@ public class ServerAppMain {
     private static boolean mapChanged = false;
     private static final int port = 5000;
     private static Logger logger = Logger.getLogger(ServerAppMain.class.getName());
+    private static final ReentrantReadWriteLock mapLock  = new ReentrantReadWriteLock(true);
+    private static final ReentrantReadWriteLock mapChangedLock  = new ReentrantReadWriteLock(true);
 
     public static void main(String[] args) {
         playersMap = FXCollections.observableMap(new HashMap());
@@ -40,6 +42,15 @@ public class ServerAppMain {
     }
 
     private static void addPlayersChangedListener() {
+		mapLock.writeLock().lock();
+		mapChanged.writeLock().lock();
+        try{
+            HashSet<String> activePlayersUsernames = new HashSet<>(playersMap.keySet());
+			return activePlayersUsernames;
+        }finally {
+            mapLock.writeLock().unlock();
+			mapChanged.writeLock.unlock();
+        }
         playersMap.addListener((MapChangeListener<? super String, ? super Player>) change -> {
                     mapChanged = true;
                     logger.info("Map changed");
@@ -47,32 +58,62 @@ public class ServerAppMain {
         );
     }
 
-    public static synchronized HashSet<String> getOnlinePlayers() {
+    public static HashSet<String> getOnlinePlayers() {
         //return playersMap.values().stream().collect(Collectors.toList());
-        HashSet<String> activePlayersUsernames = new HashSet<>(playersMap.keySet());
+		mapLock.readLock().lock();
+        try{
+            HashSet<String> activePlayersUsernames = new HashSet<>(playersMap.keySet());
         return activePlayersUsernames;
+        }finally {
+            mapLock.readLock().unlock();
+        }
+        
     }
 
-    public static synchronized void addToActivePlayers(Player player) {
-        playersMap.put(player.getUsername(), player);
-        if (playersMap.size() == 1) {
-            addPlayersChangedListener();
+    public static void addToActivePlayers(Player player) {
+		mapLock.writeLock.lock()
+		try{
+			playersMap.put(player.getUsername(), player);
+			if (playersMap.size() == 1)
+				addPlayersChangedListener();
+        }finally {
+            mapLock.writeLock().unlock();
         }
     }
 
-    public static synchronized Socket findSocket(String username) {
-        return playersMap.get(username).getSocket();
+    public static Socket findSocket(String username) {
+		mapLock.readLock().lock();
+        try{
+			return playersMap.get(username).getSocket();
+        }finally {
+            mapLock.readLock().unlock();
+        }
     }
 
-    public static synchronized boolean isMapChanged() {
-        return mapChanged;
+    public static boolean isMapChanged() {
+		mapChangedLock.readLock().lock();
+        try{
+			return mapChanged;
+        }finally {
+            mapChangedLock.readLock().unlock();
+        }
     }
 
-    public static synchronized void removePlayerFromActive(String username) {
-        playersMap.remove(username);
+    public static void removePlayerFromActive(String username) {
+		mapLock.writeLock.lock()
+		try{
+			playersMap.remove(username);
+        }finally {
+            mapLock.writeLock().unlock();
+        }
     }
 
-    public static synchronized void setMapChanged(boolean mapChanged) {
-            mapChanged = mapChanged;
+    public static void setMapChanged(boolean mapChanged) {
+        mapChangedLock.writeLock().lock();
+        try{
+			this.mapChanged = mapChanged;
+        }finally {
+            mapChangedLock.writeLock().unlock();
+        }
     }
 }
