@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -43,19 +44,17 @@ public class ServerAppMain {
 
     private static void addPlayersChangedListener() {
 		mapLock.writeLock().lock();
-		mapChanged.writeLock().lock();
+        mapChangedLock.writeLock().lock();
         try{
-            HashSet<String> activePlayersUsernames = new HashSet<>(playersMap.keySet());
-			return activePlayersUsernames;
+            playersMap.addListener((MapChangeListener<? super String, ? super Player>) change -> {
+                        mapChanged = true;
+                        logger.info("Map changed");
+                    }
+            );
         }finally {
             mapLock.writeLock().unlock();
-			mapChanged.writeLock.unlock();
+            mapChangedLock.writeLock().unlock();
         }
-        playersMap.addListener((MapChangeListener<? super String, ? super Player>) change -> {
-                    mapChanged = true;
-                    logger.info("Map changed");
-                }
-        );
     }
 
     public static HashSet<String> getOnlinePlayers() {
@@ -71,7 +70,7 @@ public class ServerAppMain {
     }
 
     public static void addToActivePlayers(Player player) {
-		mapLock.writeLock.lock()
+		mapLock.writeLock().lock();
 		try{
 			playersMap.put(player.getUsername(), player);
 			if (playersMap.size() == 1)
@@ -100,7 +99,7 @@ public class ServerAppMain {
     }
 
     public static void removePlayerFromActive(String username) {
-		mapLock.writeLock.lock()
+		mapLock.writeLock().lock();
 		try{
 			playersMap.remove(username);
         }finally {
@@ -111,7 +110,7 @@ public class ServerAppMain {
     public static void setMapChanged(boolean mapChanged) {
         mapChangedLock.writeLock().lock();
         try{
-			this.mapChanged = mapChanged;
+			ServerAppMain.mapChanged = mapChanged;
         }finally {
             mapChangedLock.writeLock().unlock();
         }
