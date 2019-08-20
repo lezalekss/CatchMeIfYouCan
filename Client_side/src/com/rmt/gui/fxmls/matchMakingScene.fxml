@@ -11,7 +11,7 @@
 <?import com.jfoenix.controls.JFXButton?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
-          fx:controller="com.rmt.gui.controllers.ActivePlayersController"
+          fx:controller="com.rmt.gui.controllers.MatchMakingController"
           alignment="CENTER" gridLinesVisible="true"
           stylesheets="@../style/test-theme.css"
           prefHeight="400.0" prefWidth="600.0">
@@ -23,15 +23,19 @@
     <rowConstraints>
         <RowConstraints percentHeight="60" valignment="CENTER"/>
         <RowConstraints percentHeight="10" valignment="CENTER"/>
+        <RowConstraints percentHeight="10" valignment="CENTER"/>
     </rowConstraints>
 
     <JFXListView fx:id = "activePlayersListView" GridPane.rowIndex="0" GridPane.columnIndex="0" >
 
     </JFXListView>
 
-    <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="start-button" GridPane.rowIndex="1" GridPane.columnIndex="0">
 
-    </JFXButton>
+    <JFXButton fx:id="refreshButton" onAction="#onRefreshButtonClicked" text="REFRESH" styleClass="start-button"
+               GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+
+    <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="start-button"
+               GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
 
 </GridPane>

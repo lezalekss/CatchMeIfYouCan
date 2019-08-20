@@ -1,6 +1,6 @@
 package com.rmt.services;
 
-import com.rmt.gui.controllers.ActivePlayersController;
+import com.rmt.gui.controllers.MatchMakingController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -36,9 +36,9 @@ public class StageService {
     }
 
     public void changeToActivePlayersScene(ActionEvent event, String username) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/activePlayersScene.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/matchMakingScene.fxml"));
         Stage currentStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
         currentStage.getScene().setRoot(loader.load());
-        ((ActivePlayersController)loader.getController()).setUsername(username);
+        ((MatchMakingController)loader.getController()).setUsername(username);
     }
 }

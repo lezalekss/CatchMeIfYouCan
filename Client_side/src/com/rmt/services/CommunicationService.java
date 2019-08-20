@@ -1,6 +1,7 @@
 package com.rmt.services;
 
 import com.rmt.domain.Message;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableSet;
 
 import java.io.*;
@@ -8,6 +9,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class CommunicationService {
 
@@ -16,7 +18,10 @@ public class CommunicationService {
     private ObjectInputStream serverInput = null;
     private ObjectOutputStream serverOutput = null;
 
-    private Thread updatePlayersThread;
+    private ChallengeWaiter challengeWaiter;
+
+    private static final ReentrantReadWriteLock serverInputLock = new ReentrantReadWriteLock(true);
+
 
     private CommunicationService() {
     }
@@ -84,14 +89,6 @@ public class CommunicationService {
     public Set<String> getActivePlayers() {
         try {
             this.sendMessage(Message.MessageType.GET_ACTIVE, "");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return this.forwardChangedPlayersList();
-    }
-
-    public Set<String> forwardChangedPlayersList() {
-        try {
             return (Set<String>) this.serverInput.readObject();
         } catch (IOException e) {
             e.printStackTrace();
@@ -101,20 +98,89 @@ public class CommunicationService {
         return null;
     }
 
-    public void challengeOpponent(String opponentUsername) {
+    public boolean challengeOpponent(String opponentUsername) {
+        System.out.println("Comm service pozvan\n");
+
         try {
             this.sendMessage(Message.MessageType.PLAY_WITH, opponentUsername);
+
+            System.out.println("Poslat play with uh-u \n");
+
+            Message answer = (Message) this.serverInput.readObject();
+            if (answer.getType() == Message.MessageType.ERROR) {
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        //change
+        return true;
+    }
+
+    public void updatePlayers(ObservableSet<String> players) {
+        try {
+            serverInputLock.readLock().lock();
+            System.out.println("UT locked server input stream\n");
+            try {
+                this.serverOutput.writeObject(new Message(Message.MessageType.UPDATE_ACTIVE, ""));
+                System.out.println("UT sent request\n");
+                HashSet<String> updatedPlayers = (HashSet<String>) this.serverInput.readObject();
+                System.out.println("UT got the players\n");
+
+                players.addAll(updatedPlayers);
+            } finally {
+                serverInputLock.readLock().unlock();
+                System.out.println("UT unlocked server input stream\n");
+            }
+        } catch (ClassNotFoundException e) {
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void updatePlayers(ObservableSet<String> activePlayersSet) {
-        updatePlayersThread = new UpdatePlayersThread(this.serverOutput, this.serverInput, activePlayersSet);
-        updatePlayersThread.start();
+
+    public void challengeAccepted() {
+        try {
+            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES");
+            Message signal = (Message) serverInput.readObject();
+            if(signal.getMessageText().equals("Send again")){
+                this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void stopUpdating(){
-        this.updatePlayersThread.interrupt();
+    public void challengeRejected(){
+        try {
+            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "NO");
+            Message signal = (Message) serverInput.readObject();
+            if(signal.getMessageText().equals("Send again")){
+                this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "NO");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void waitToBeChallenged(BooleanProperty challengeSent, BooleanProperty challengeReceived, String challengerUsername) {
+        this.challengeWaiter = new ChallengeWaiter(this.serverInput, this.serverOutput, challengeSent, challengeReceived, challengerUsername);
+        challengeWaiter.start();
+    }
+
+    public void logout(){
+        try {
+            this.sendMessage(Message.MessageType.LOG_OUT, "");
+            System.out.println("CS sent logut message");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
