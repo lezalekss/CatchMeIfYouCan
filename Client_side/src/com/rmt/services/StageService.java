@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -29,6 +30,15 @@ public class StageService {
         currentScene.getScene().setRoot(parent);
         currentScene.show();
     }
+
+    public void changeScene(String newScene, Scene scene) throws IOException {
+        Parent parent = FXMLLoader.load(getClass().getClassLoader().getResource(newScene));
+        Stage currentStage = (Stage) scene.getWindow();
+        currentStage.getScene().setRoot(parent);
+        currentStage.show();
+    }
+
+
 
     public void quit(ActionEvent event){
         Stage currentScene = (Stage) ((Node)(event.getSource())).getScene().getWindow();

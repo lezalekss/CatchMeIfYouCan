@@ -3,6 +3,7 @@ package com.rmt.services;
 import com.rmt.domain.Message;
 import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableSet;
+import javafx.concurrent.Task;
 
 import java.io.*;
 import java.net.Socket;
@@ -107,7 +108,12 @@ public class CommunicationService {
             System.out.println("Poslat play with uh-u \n");
 
             Message answer = (Message) this.serverInput.readObject();
-            if (answer.getType() == Message.MessageType.ERROR) {
+
+            System.out.println("CS izazivaca primio odg\n");
+
+            if (answer.getType() == Message.MessageType.ANSWERS && answer.getMessageText().equals("YES")) {
+                return true;
+            } else {
                 return false;
             }
         } catch (IOException e) {
@@ -116,7 +122,7 @@ public class CommunicationService {
             e.printStackTrace();
         }
         //change
-        return true;
+        return false;
     }
 
     public void updatePlayers(ObservableSet<String> players) {
@@ -127,8 +133,13 @@ public class CommunicationService {
                 this.serverOutput.writeObject(new Message(Message.MessageType.UPDATE_ACTIVE, ""));
                 System.out.println("UT sent request\n");
                 HashSet<String> updatedPlayers = (HashSet<String>) this.serverInput.readObject();
-                System.out.println("UT got the players\n");
 
+                System.out.println("UT got the players\n");
+                for (String s : updatedPlayers) {
+                    System.out.println(s);
+                }
+
+                players.removeAll(players);
                 players.addAll(updatedPlayers);
             } finally {
                 serverInputLock.readLock().unlock();
@@ -142,40 +153,30 @@ public class CommunicationService {
     }
 
 
-    public void challengeAccepted() {
+    public void challengeAccepted(String challengerUsername) {
         try {
-            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES");
-            Message signal = (Message) serverInput.readObject();
-            if(signal.getMessageText().equals("Send again")){
-                this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES");
-            }
+            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES\n" + challengerUsername);
+            this.serverOutput.flush();
+
+            System.out.println("COMM S sent YES\n");
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public void challengeRejected(){
+    public void challengeRejected(String challengerUsername) {
         try {
-            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "NO");
-            Message signal = (Message) serverInput.readObject();
-            if(signal.getMessageText().equals("Send again")){
-                this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "NO");
-            }
+            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "NO\n" + challengerUsername);
+            this.serverOutput.flush();
+
+            System.out.println("COMM S sent NO\n");
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
-    public void waitToBeChallenged(BooleanProperty challengeSent, BooleanProperty challengeReceived, String challengerUsername) {
-        this.challengeWaiter = new ChallengeWaiter(this.serverInput, this.serverOutput, challengeSent, challengeReceived, challengerUsername);
-        challengeWaiter.start();
-    }
 
-    public void logout(){
+    public void logout() {
         try {
             this.sendMessage(Message.MessageType.LOG_OUT, "");
             System.out.println("CS sent logut message");
@@ -183,4 +184,27 @@ public class CommunicationService {
             e.printStackTrace();
         }
     }
+
+    public void switchToWaitingForChallenge() {
+        try {
+            this.sendMessage(Message.MessageType.SWITCH, "TO WAITING");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void switchToChallenging() {
+        try {
+            this.sendMessage(Message.MessageType.SWITCH, "TO CHALLENGING");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void waitToBeChallenged(WaitingTask waitingTask) {
+        waitingTask.setServerInput(this.serverInput);
+        Thread thread = new Thread(waitingTask);
+        thread.start();
+    }
 }
+

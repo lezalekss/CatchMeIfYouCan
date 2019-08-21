@@ -3,15 +3,19 @@ package com.rmt.gui.controllers;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
 import com.rmt.services.CommunicationService;
+import com.rmt.services.StageService;
+import com.rmt.services.WaitingTask;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.*;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
@@ -26,27 +30,26 @@ public class MatchMakingController implements Initializable {
     @FXML
     JFXButton refreshButton;
 
-    private ObservableSet<String> activePlayersSet;
+    @FXML
+    JFXButton challenging;
+    @FXML
+    JFXButton waitingForChallenge;
 
-    private CommunicationService communicationService = CommunicationService.getCommunicationServiceInstance();
+
+    private ObservableSet<String> activePlayersSet;
 
     private String username;
 
     private String challengerUsername;
 
-    //value is changed by WaititngChallenge thread and Contoller is reacting in Listener
-    private BooleanProperty challengeReceived = new SimpleBooleanProperty(false);
+    private CommunicationService communicationService = CommunicationService.getCommunicationServiceInstance();
 
-    //value is changed by Controller and WaititngChallenge thread is reacting in Listener
-    private BooleanProperty challengeSent = new SimpleBooleanProperty(false);
-
+    private StageService stageService = StageService.getStageServiceInstance();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        this.challengeReceived.setValue(false);
-
-        this.challengeSent.setValue(false);
+        challenging.setDisable(true);
 
         Set<String> receivedPlayers = this.communicationService.getActivePlayers();
 
@@ -64,71 +67,29 @@ public class MatchMakingController implements Initializable {
 
         this.addPlayerSelectedListener();
 
-        this.addChallengeReceivedListener();
-
-        this.communicationService.waitToBeChallenged(this.challengeSent, this.challengeReceived,
-          this.challengerUsername);
-
     }
 
-    private void addChallengeReceivedListener() {
-        this.challengeReceived.addListener((observable, oldValue, newValue) -> {
-            if (newValue == true) {
-
-                System.out.println("Contoler uvaio challenge received da je true");
-
-                this.refreshButton.setVisible(true);
-                this.logOutButton.setDisable(true);
-                this.activePlayersListView.setDisable(true);
-
-                System.out.println("izgasio dugmice");
-
-                boolean accepted = this.showChallengeReceivingDialog(this.challengerUsername);
-
-                System.out.println("Izazov prihvacen? "+accepted);
-
-                if (accepted) {
-                    this.communicationService.challengeAccepted();
-                    //promeni na scenu na igru
-                } else {
-                    this.communicationService.challengeRejected();
-
-                    this.refreshButton.setVisible(false);
-                    this.logOutButton.setDisable(false);
-                    this.activePlayersListView.setDisable(false);
-
-                    this.communicationService.waitToBeChallenged(this.challengeSent, this.challengeReceived,
-                            this.challengerUsername);
-
-                    this.challengeReceived.setValue(false);
-                }
-            }
-        });
-    }
 
     private void addPlayerSelectedListener() {
         this.activePlayersListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete "+newValue.toString()+"?");
+            Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete " + newValue.toString() + "?");
             Optional<ButtonType> answer = alert.showAndWait();
             if (answer.get() == ButtonType.OK) {
                 System.out.println("Izazvan \n");
 
-                //this shuts down challenge waiter
-                this.challengeSent.setValue(true);
-                System.out.println("Promenjena vred challenge sent \n");
-
                 boolean challengeSuccessful = this.communicationService.challengeOpponent(newValue.toString());
 
-
-                if(challengeSuccessful == false){
-                    alert = this.createAlert(Alert.AlertType.ERROR, newValue.toString()+" vise nije aktivan. Pokusajte ponovo.");
+                if (challengeSuccessful == false) {
+                    alert = this.createAlert(Alert.AlertType.ERROR, newValue.toString() + "vise nije aktivan ili je odbio poziv");
                     alert.showAndWait();
                     return;
+                }else{
+                    try {
+                        stageService.changeScene("com/rmt/gui/fxmls/play.fxml", refreshButton.getScene());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-                //prihvacen izazov, comm service vratio true, igra moze da pocne
-
-
-
             }
         });
     }
@@ -136,11 +97,76 @@ public class MatchMakingController implements Initializable {
     private void addSetChangedListener() {
         this.activePlayersSet.addListener((SetChangeListener<? super String>) c -> {
                     //this.activePlayersSet.remove(this.username);
+                    this.activePlayersListView.getItems().clear();
                     this.activePlayersListView.getItems().setAll(this.activePlayersSet);
                     System.out.println("Set updated in controller");
                 }
-
         );
+    }
+
+    public void switchToWaitingForChallenge(ActionEvent event) {
+
+        this.waitToBeChallenged();
+
+        this.communicationService.switchToWaitingForChallenge();
+
+        this.activePlayersListView.setDisable(true);
+        this.refreshButton.setDisable(true);
+        this.challenging.setDisable(false);
+        this.waitingForChallenge.setDisable(true);
+    }
+
+    private void waitToBeChallenged() {
+        WaitingTask waitingTask = new WaitingTask();
+        waitingTask.valueProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                this.challengerUsername = newValue;
+                this.challengeReceived();
+            }
+        });
+        this.communicationService.waitToBeChallenged(waitingTask);
+
+    }
+
+    public void switchToChallenging(ActionEvent event) {
+
+        this.communicationService.switchToChallenging();
+
+        this.activePlayersListView.setDisable(false);
+        this.refreshButton.setDisable(false);
+        this.challenging.setDisable(true);
+        this.waitingForChallenge.setDisable(false);
+    }
+
+    private void challengeReceived() {
+        System.out.println("Contoler uvaio challenge received da je true");
+
+        this.refreshButton.setVisible(true);
+        this.logOutButton.setDisable(true);
+        this.activePlayersListView.setDisable(true);
+
+        System.out.println("izgasio dugmice");
+
+        boolean accepted = this.showChallengeReceivingDialog(this.challengerUsername);
+
+        System.out.println("Izazov prihvacen? " + accepted);
+
+        if (accepted) {
+            this.communicationService.challengeAccepted(this.challengerUsername);
+            try {
+                stageService.changeScene("com/rmt/gui/fxmls/play.fxml", refreshButton.getScene());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.communicationService.challengeRejected(this.challengerUsername);
+
+            this.refreshButton.setDisable(false);
+            this.logOutButton.setDisable(false);
+            this.activePlayersListView.setDisable(false);
+
+            this.waitToBeChallenged();
+        }
     }
 
     private Alert createAlert(Alert.AlertType type, String message) {
@@ -189,4 +215,6 @@ public class MatchMakingController implements Initializable {
     public void setUsername(String username) {
         this.username = username;
     }
+
+
 }

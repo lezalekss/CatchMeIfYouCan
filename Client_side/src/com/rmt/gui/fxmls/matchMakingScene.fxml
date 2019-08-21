@@ -21,9 +21,10 @@
     </columnConstraints>
 
     <rowConstraints>
-        <RowConstraints percentHeight="60" valignment="CENTER"/>
+        <RowConstraints percentHeight="50" valignment="CENTER"/>
         <RowConstraints percentHeight="10" valignment="CENTER"/>
         <RowConstraints percentHeight="10" valignment="CENTER"/>
+        <RowConstraints percentHeight="20" valignment="CENTER"/>
     </rowConstraints>
 
     <JFXListView fx:id = "activePlayersListView" GridPane.rowIndex="0" GridPane.columnIndex="0" >
@@ -37,5 +38,10 @@
     <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="start-button"
                GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
+    <HBox GridPane.rowIndex="3" GridPane.columnIndex="0">
+        <JFXButton fx:id="challenging"  text="CHALLENGING" onAction="#switchToChallenging" styleClass="start-button"/>
+        <JFXButton fx:id="waitingForChallenge" onAction="#switchToWaitingForChallenge"  text="WAITING FOR CHALLENGE" styleClass="start-button"/>
+
+    </HBox>
 
 </GridPane>

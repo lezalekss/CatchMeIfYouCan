@@ -35,32 +35,25 @@ public class ChallengeWaiter extends Thread {
     public void run() {
         System.out.println("CW: aktivan \n");
 
-        //this.addChallengeSentListener();
         try {
-            while (this.isInterrupted() == false) {
-//                if (this.serverInput.available() != 0) {
+                Message msg = (Message) this.serverInput.readObject();
 
-//                    serverInputLock.readLock().lock();
-//                    try {
-                        Message msg = (Message) this.serverInput.readObject();
+                System.out.println("CW: poziv procitan\n");
 
-                        System.out.println("CW: poziv procitan\n");
+                if (msg.getType() == Message.MessageType.PLAY_WITH) {
 
-                        if (msg.getType() == Message.MessageType.PLAY_WITH) {
+                    this.challengerUsername = msg.getMessageText();
 
-                            this.challengerUsername = msg.getMessageText();
+                    System.out.println("CW: postavio challenger username");
 
-                            System.out.println("CW: postavio challenger username");
+                    this.challengeReceived.setValue(true);
 
-                            this.challengeReceived.setValue(true);
+                    System.out.println("CW postavio true za challenge received i gasi se");
 
-                            System.out.println("CW postavio true za challenge received i gasi se");
-
-                            return;
-                        } else if(msg.getType() == Message.MessageType.ANSWERS && msg.getMessageText().equals("STOP")){
-                            this.serverOutput.writeObject(new Message(Message.MessageType.ANSWERS, "STOPPED"));
-                            return;
-                        }
+                    return;
+                } else if (msg.getType() == Message.MessageType.ANSWERS && msg.getMessageText().equals("STOP")) {
+                    return;
+                }
 //                    } finally {
 //                        serverInputLock.readLock().unlock();
 //                    }
@@ -68,7 +61,7 @@ public class ChallengeWaiter extends Thread {
 //                else {
 //                    this.sleep(5000);
 //                }
-            }
+
 //        } catch (InterruptedException e) {
 //            System.out.println("CW se gasi\n");
 //
@@ -80,14 +73,6 @@ public class ChallengeWaiter extends Thread {
         }
     }
 
-    private void addChallengeSentListener() {
-        this.challengeSent.addListener((observable, oldValue, newValue) -> {
-            if (newValue == true){
-                System.out.println("CW uvatio true za challenge sent\n");
-                this.challengeSent.setValue(false);
-            }
-        });
-    }
 
 }
 

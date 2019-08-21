@@ -10,7 +10,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashSet;
-import java.util.Set;
 import java.net.SocketException;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -26,8 +25,8 @@ public class UserHandler extends Thread {
     private ObjectOutputStream opponentOutput;
     private DBConnection dbConn;
 
-    private static final ReentrantReadWriteLock userOutputStreamLock = new ReentrantReadWriteLock(true);
-    private static final ReentrantReadWriteLock opponentOutputStreamLock = new ReentrantReadWriteLock(true);
+    private static final ReentrantReadWriteLock userInputStreamLock = new ReentrantReadWriteLock(true);
+    private static final ReentrantReadWriteLock opponentInputStreamLock = new ReentrantReadWriteLock(true);
 
     public UserHandler(Socket socket) {
         user = new Player(socket);
@@ -44,7 +43,7 @@ public class UserHandler extends Thread {
 
             while (true) {
                 Message msg = (Message) userInput.readObject();
-
+                System.out.println("UH u velikom while-u\n");
                 switch (msg.getType()) {
                     case LOGIN:
                         this.login(msg);
@@ -62,29 +61,45 @@ public class UserHandler extends Thread {
                     }
                     case PLAY_WITH: {
                         System.out.println("UH: PW primljen\n");
-                        ServerAppMain.removePlayerFromActive(this.user.getUsername());
+                        //svakako je neaktivan ko izaziva
+                        // ServerAppMain.removePlayerFromActive(this.user.getUsername());
                         this.challenge(msg.getMessageText());
                         break;
                     }
                     case CHALLENGE_ANSWER: {
-                        System.out.println("UH od izazvanog primio odg\n");
+                        System.out.println("UH izvaznog od izazvanog klijenta primio odg\n");
 
-                        this.userOutput.writeObject(new Message(Message.MessageType.ANSWERS, "Send again"));
+                        String[] messageText = msg.getMessageText().split("\n");
 
-                        System.out.println("UH od izazvanog poslo klijentu da posalje opet odg\n");
+                        ObjectOutputStream challengerOutput = ServerAppMain.findOfflinePlayer(messageText[1]).getUserOutput();
+                        challengerOutput.writeObject(new Message(Message.MessageType.ANSWERS, messageText[0]));
 
-                        if (msg.getMessageText().equals("YES")) {
-                            this.startGame();
+                        System.out.println("UH posledio odg CS-u izazivaca\n");
+
+                        if (messageText[0].equals("YES")) {
+                            System.out.println("UH u startGame metodi\n");
+                           // this.startGame();
                             break;
                         } else {
                             break;
                         }
-                    }case LOG_OUT:{
-                        System.out.println("UH received logout message");
-                        this.userOutput.writeObject(new Message(Message.MessageType.PLAY_WITH, user.getUsername()));
-                        this.userOutput.flush();
-                        System.out.println("UH sent test play with message");
-                        break;
+                    }
+                    case LOG_OUT: {
+
+                    }
+                    case SWITCH: {
+                        if (msg.getMessageText().equals("TO WAITING")) {
+                            this.user.setStatus(Player.PlayerStatus.ACTIVE);
+                            ServerAppMain.removePlayerFromOffline(user.getUsername());
+                            ServerAppMain.addToActivePlayers(user);
+                            break;
+                        } else if (msg.getMessageText().equals("TO CHALLENGING")) {
+                            this.sendAnswer("STOP");
+                            this.user.setStatus(Player.PlayerStatus.OFFLINE);
+                            ServerAppMain.removePlayerFromActive(user.getUsername());
+                            ServerAppMain.addToOfflinePlayers(user);
+                            break;
+                        }
                     }
                     default:
                         this.sendError("Unexpected error");
@@ -93,11 +108,19 @@ public class UserHandler extends Thread {
             }
         } catch (java.io.EOFException e) {
             //kad kliknem na x u klijentu iskoci ovo
-            ServerAppMain.removePlayerFromActive(user.getUsername());
+            if(user.getStatus()== Player.PlayerStatus.ACTIVE){
+                ServerAppMain.removePlayerFromActive(user.getUsername());
+            }else{
+                ServerAppMain.removePlayerFromOffline(user.getUsername());
+            }
             System.out.println("Player " + user.getUsername() + " just exited");
         } catch (SocketException e) {
             //e.printStackTrace(); // client shuts down
-            ServerAppMain.removePlayerFromActive(this.user.getUsername());
+            if(user.getStatus()== Player.PlayerStatus.ACTIVE){
+                ServerAppMain.removePlayerFromActive(user.getUsername());
+            }else{
+                ServerAppMain.removePlayerFromOffline(user.getUsername());
+            }
             System.out.println("Player " + user.getUsername() + " just exited");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -111,22 +134,22 @@ public class UserHandler extends Thread {
 
     private void challenge(String opponentUsername) throws IOException, ClassNotFoundException {
 //      check for opponent status first
-
+        //ne bi trebalo da moze da se izazove neko ko je neaktivan
         if (ServerAppMain.isActive(opponentUsername) == false) {
             this.sendError("Opponent is not active anymore");
             return;
         }
-        Player opponent = ServerAppMain.findPlayer(opponentUsername);
+        //ako ga izazivam menjam mu status da ga ne izazove neko drugi, ako odbije da mu vratim status
 
+        Player opponent = ServerAppMain.findActivePlayer(opponentUsername);
         System.out.println("Naso protivnika u mapi\n");
 
-        //ako ga izazivam menjam mu status da ga ne izazove neko drugi, ako odbije da mu vratim status
         ServerAppMain.removePlayerFromActive(opponentUsername);
+        ServerAppMain.addToOfflinePlayers(opponent);
 
         System.out.println("UH stavio izvanog u neaktivne");
 
         ObjectOutputStream opponentOutput = opponent.getUserOutput();
-        ObjectInputStream opponentInput = opponent.getUserInput();
 
         System.out.println("UH: naso za izazvanog strimove");
 
@@ -134,24 +157,6 @@ public class UserHandler extends Thread {
         opponentOutput.flush();
 
         System.out.println("UH poslo izvanom pw\n");
-
-        Message answer = (Message) opponentInput.readObject();
-
-        System.out.println("UH: Izazivac primio odg\n");
-
-        if (answer.getType() == Message.MessageType.CHALLENGE_ANSWER) {
-            opponentOutput.writeObject(new Message(Message.MessageType.ANSWERS, "Send again"));
-            System.out.println("UH: Izazivac poslo klijentu da posalje opet odg\n");
-        }
-        if (answer.getMessageText().equals("YES")) {
-
-        } else {
-
-        }
-        //
-        //
-        //
-        //
     }
 
 
@@ -160,36 +165,27 @@ public class UserHandler extends Thread {
         players.remove(user.getUsername());
         this.userOutput.writeObject(players);
         //TODO: Add some sleeping maybe
-        ServerAppMain.addToActivePlayers(user);
+        // ServerAppMain.addToActivePlayers(user);
     }
 
 
     private void updateActivePlayers() throws IOException {
         //da ga neko ne bi izazvao dok se updatuje
-        ServerAppMain.removePlayerFromActive(this.user.getUsername());
+
+//       #TODO POPRAVI OVO
+        //ServerAppMain.removePlayerFromActive(this.user.getUsername());
+
 
         HashSet<String> players = ServerAppMain.getOnlinePlayers();
         players.remove(user.getUsername());
 
-//        userOutputStreamLock.writeLock().lock();
-//        try {
         this.userOutput.writeObject(players);
         this.userOutput.flush();
 
         System.out.println("Players sent\n");
 
-       /* try {
-            this.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
-        ServerAppMain.addToActivePlayers(this.user);
-
-//        } finally {
-//            userOutputStreamLock.writeLock().unlock();
-        //kad se zavrsi update vrati ga u aktivne
-//        }
+//       #TODO POPRAVI OVO
+        //ServerAppMain.addToActivePlayers(this.user);
     }
 
     private void login(Message msg) throws IOException {
@@ -203,7 +199,8 @@ public class UserHandler extends Thread {
         }
         this.sendAnswer("OK");
         user.setUsername(userAndPass[0]);
-        user.setStatus(Player.PlayerStatus.ACTIVE);
+        user.setStatus(Player.PlayerStatus.OFFLINE);
+        ServerAppMain.addToOfflinePlayers(user);
     }
 
     private void register(Message msg) throws IOException {
@@ -215,7 +212,8 @@ public class UserHandler extends Thread {
         this.sendAnswer("OK");
 //        dbConn.insertIntoDatabase(userAndPass[0], userAndPass[1]);
         user.setUsername(userAndPass[0]);
-        user.setStatus(Player.PlayerStatus.ACTIVE);
+        user.setStatus(Player.PlayerStatus.OFFLINE);
+        ServerAppMain.addToOfflinePlayers(user);
     }
 
     private void inGameScene(String username) {

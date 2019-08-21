@@ -12,11 +12,11 @@ import java.net.Socket;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 
 public class ServerAppMain {
-    private static ObservableMap<String, Player> playersMap;
+    private static ObservableMap<String, Player> activePlayersMap;
+    private static ObservableMap<String, Player> offlinePlayersMap;
     private static boolean mapChanged = false;
     private static final int port = 5000;
     private static Logger logger = Logger.getLogger(ServerAppMain.class.getName());
@@ -24,7 +24,8 @@ public class ServerAppMain {
     private static final ReentrantReadWriteLock mapChangedLock = new ReentrantReadWriteLock(true);
 
     public static void main(String[] args) {
-        playersMap = FXCollections.observableMap(new HashMap());
+        activePlayersMap = FXCollections.observableMap(new HashMap());
+        offlinePlayersMap = FXCollections.observableMap(new HashMap());
 
         //addPlayersChangedListener();
 
@@ -46,7 +47,7 @@ public class ServerAppMain {
         mapLock.writeLock().lock();
         mapChangedLock.writeLock().lock();
         try {
-            playersMap.addListener((MapChangeListener<? super String, ? super Player>) change -> {
+            activePlayersMap.addListener((MapChangeListener<? super String, ? super Player>) change -> {
                         mapChanged = true;
                     }
             );
@@ -57,23 +58,31 @@ public class ServerAppMain {
     }
 
     public static HashSet<String> getOnlinePlayers() {
-        //return playersMap.values().stream().collect(Collectors.toList());
+        //return activePlayersMap.values().stream().collect(Collectors.toList());
         mapLock.readLock().lock();
         try {
-            HashSet<String> activePlayersUsernames = new HashSet<>(playersMap.keySet());
+            HashSet<String> activePlayersUsernames = new HashSet<>(activePlayersMap.keySet());
             return activePlayersUsernames;
         } finally {
             mapLock.readLock().unlock();
         }
-
     }
 
     public static void addToActivePlayers(Player player) {
         mapLock.writeLock().lock();
         try {
-            playersMap.put(player.getUsername(), player);
-            if (playersMap.size() == 1)
+            activePlayersMap.put(player.getUsername(), player);
+            if (activePlayersMap.size() == 1)
                 addPlayersChangedListener();
+        } finally {
+            mapLock.writeLock().unlock();
+        }
+    }
+
+    public static void addToOfflinePlayers(Player player) {
+        mapLock.writeLock().lock();
+        try {
+            offlinePlayersMap.put(player.getUsername(), player);
         } finally {
             mapLock.writeLock().unlock();
         }
@@ -82,16 +91,25 @@ public class ServerAppMain {
     public static Socket findSocket(String username) {
         mapLock.readLock().lock();
         try {
-            return playersMap.get(username).getSocket();
+            return activePlayersMap.get(username).getSocket();
         } finally {
             mapLock.readLock().unlock();
         }
     }
 
-    public static Player findPlayer(String username) {
+    public static Player findActivePlayer(String username) {
         mapLock.readLock().lock();
         try {
-            return playersMap.get(username);
+            return activePlayersMap.get(username);
+        } finally {
+            mapLock.readLock().unlock();
+        }
+    }
+
+    public static Player findOfflinePlayer(String username) {
+        mapLock.readLock().lock();
+        try {
+            return offlinePlayersMap.get(username);
         } finally {
             mapLock.readLock().unlock();
         }
@@ -100,7 +118,7 @@ public class ServerAppMain {
     public static boolean isActive(String username) {
         mapLock.readLock().lock();
         try {
-            return playersMap.get(username) != null;
+            return activePlayersMap.get(username) != null;
         } finally {
             mapLock.readLock().unlock();
         }
@@ -118,7 +136,16 @@ public class ServerAppMain {
     public static void removePlayerFromActive(String username) {
         mapLock.writeLock().lock();
         try {
-            playersMap.remove(username);
+            activePlayersMap.remove(username);
+        } finally {
+            mapLock.writeLock().unlock();
+        }
+    }
+
+    public static void removePlayerFromOffline(String username) {
+        mapLock.writeLock().lock();
+        try {
+            offlinePlayersMap.remove(username);
         } finally {
             mapLock.writeLock().unlock();
         }
