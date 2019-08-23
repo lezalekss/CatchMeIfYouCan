@@ -11,22 +11,15 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashSet;
 import java.net.SocketException;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class UserHandler extends Thread {
 
     private Player user;
-    private Player opponent;
 
     private ObjectInputStream userInput;
     private ObjectOutputStream userOutput;
 
-    private ObjectInputStream opponentInput;
-    private ObjectOutputStream opponentOutput;
     private DBConnection dbConn;
-
-    private static final ReentrantReadWriteLock userInputStreamLock = new ReentrantReadWriteLock(true);
-    private static final ReentrantReadWriteLock opponentInputStreamLock = new ReentrantReadWriteLock(true);
 
     public UserHandler(Socket socket) {
         user = new Player(socket);
@@ -71,16 +64,21 @@ public class UserHandler extends Thread {
 
                         String[] messageText = msg.getMessageText().split("\n");
 
-                        ObjectOutputStream challengerOutput = ServerAppMain.findOfflinePlayer(messageText[1]).getUserOutput();
+                        Player opponent = ServerAppMain.findOfflinePlayer(messageText[1]);
+                        ObjectOutputStream challengerOutput = opponent.getUserOutput();
                         challengerOutput.writeObject(new Message(Message.MessageType.ANSWERS, messageText[0]));
 
                         System.out.println("UH posledio odg CS-u izazivaca\n");
 
                         if (messageText[0].equals("YES")) {
                             System.out.println("UH u startGame metodi\n");
-                           // this.startGame();
+                            // u start game izazivacev username mora da bude prvi, a ovaj koji je izazvan drugi,
+                            // zbog pretrage u mapi u GameHandler klasi jer je to kljuc
+                            this.startGame(String.format("%s#%s",opponent.getUsername(),user.getUsername()));
                             break;
                         } else {
+                            ServerAppMain.removePlayerFromOffline(user.getUsername());
+                            ServerAppMain.addToActivePlayers(user);
                             break;
                         }
                     }
@@ -101,6 +99,9 @@ public class UserHandler extends Thread {
                             break;
                         }
                     }
+                    //case GAME_ACCEPTED:{
+                    //  startGame();
+                    // }
                     default:
                         this.sendError("Unexpected error");
                         break;
@@ -129,7 +130,7 @@ public class UserHandler extends Thread {
         }
     }
 
-    private void startGame() {
+    private void startGame(String usernames) {
     }
 
     private void challenge(String opponentUsername) throws IOException, ClassNotFoundException {

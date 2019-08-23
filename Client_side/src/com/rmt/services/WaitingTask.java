@@ -26,20 +26,25 @@ public class WaitingTask extends Task<String> {
         System.out.println("CW: aktivan \n");
 
         try {
-            Message msg = (Message) serverInput.readObject();
+            Object o = (Object)serverInput.readObject();
+            if(o instanceof Message) {
+                Message msg = (Message)o;
 
-            System.out.println("CW: poruka procitana\n");
+                System.out.println("CW: poruka procitana\n");
 
-            if (msg.getType() == Message.MessageType.PLAY_WITH) {
+                if (msg.getType() == Message.MessageType.PLAY_WITH) {
 
-                System.out.println("CW vraca username i gasi se");
+                    System.out.println("CW vraca username i gasi se");
 
-                return msg.getMessageText();
+                    return msg.getMessageText();
 
-            } else if (msg.getType() == Message.MessageType.ANSWERS && msg.getMessageText().equals("STOP")) {
+                } else if (msg.getType() == Message.MessageType.ANSWERS && msg.getMessageText().equals("STOP")) {
 
-                System.out.println("CW primio stop i gasi se\n");
-                return null;
+                    System.out.println("CW primio stop i gasi se\n");
+                    return null;
+                }
+            }else {
+                
             }
         } catch (IOException e) {
             e.printStackTrace();

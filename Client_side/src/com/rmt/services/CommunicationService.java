@@ -19,8 +19,6 @@ public class CommunicationService {
     private ObjectInputStream serverInput = null;
     private ObjectOutputStream serverOutput = null;
 
-    private ChallengeWaiter challengeWaiter;
-
     private static final ReentrantReadWriteLock serverInputLock = new ReentrantReadWriteLock(true);
 
 
@@ -135,9 +133,6 @@ public class CommunicationService {
                 HashSet<String> updatedPlayers = (HashSet<String>) this.serverInput.readObject();
 
                 System.out.println("UT got the players\n");
-                for (String s : updatedPlayers) {
-                    System.out.println(s);
-                }
 
                 players.removeAll(players);
                 players.addAll(updatedPlayers);

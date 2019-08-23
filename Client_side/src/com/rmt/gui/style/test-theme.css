@@ -11,7 +11,7 @@
     -fx-border-radius: 5px;
     -fx-background-radius: 5px;
     -jfx-button-type: RAISED;
-    -fx-font-size: 30px;
+    -fx-font-size: 20px;
 }
 .credential-label{
     -fx-font-size: 24px;
