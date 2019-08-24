@@ -1,16 +1,17 @@
 package com.rmt.services;
 
-import com.rmt.domain.Message;
-import javafx.beans.property.BooleanProperty;
-import javafx.collections.ObservableSet;
-import javafx.concurrent.Task;
+import static com.rmt.domain.Message.MessageType.GAME_ACCEPTED;
 
-import java.io.*;
+import com.rmt.domain.Message;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javafx.collections.ObservableSet;
 
 public class CommunicationService {
 
@@ -110,6 +111,7 @@ public class CommunicationService {
             System.out.println("CS izazivaca primio odg\n");
 
             if (answer.getType() == Message.MessageType.ANSWERS && answer.getMessageText().equals("YES")) {
+                this.sendMessage(GAME_ACCEPTED,opponentUsername);
                 return true;
             } else {
                 return false;

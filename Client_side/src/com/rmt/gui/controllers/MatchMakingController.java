@@ -2,6 +2,9 @@ package com.rmt.gui.controllers;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXListView;
+import static com.rmt.domain.Message.MessageType;
+import static com.rmt.domain.Message.MessageType.GAME_ACCEPTED;
+
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
 import com.rmt.services.WaitingTask;

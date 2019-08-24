@@ -15,6 +15,6 @@ public class Message implements Serializable {
 
     public enum MessageType{
         LOGIN,REGISTER,LOG_OUT,ANSWERS,ERROR,GET_ACTIVE,UPDATE_ACTIVE,PLAY_WITH,CHALLENGE_ANSWER,
-        SWITCH
+        SWITCH,GAME_ACCEPTED
     }
 }

@@ -1,16 +1,17 @@
 package com.rmt.controllers;
 
 import com.rmt.DBConnection;
-import com.rmt.domain.Message;
 import com.rmt.ServerAppMain;
+import com.rmt.domain.GamePair;
+import com.rmt.domain.Message;
 import com.rmt.domain.Player;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.HashSet;
 import java.net.SocketException;
+import java.util.HashSet;
+import java.util.concurrent.TimeoutException;
 
 public class UserHandler extends Thread {
 
@@ -19,6 +20,7 @@ public class UserHandler extends Thread {
     private ObjectInputStream userInput;
     private ObjectOutputStream userOutput;
 
+    private GamePair pair;
     private DBConnection dbConn;
 
     public UserHandler(Socket socket) {
@@ -99,9 +101,9 @@ public class UserHandler extends Thread {
                             break;
                         }
                     }
-                    //case GAME_ACCEPTED:{
-                    //  startGame();
-                    // }
+                    case GAME_ACCEPTED:{
+                      this.startGame(String.format("%s#%s",user.getUsername(),msg.getMessageText()));
+                    }
                     default:
                         this.sendError("Unexpected error");
                         break;
@@ -131,6 +133,40 @@ public class UserHandler extends Thread {
     }
 
     private void startGame(String usernames) {
+        // startovanje prve igre
+        this.pair = GameHandler.addPairToMap(usernames);
+        try { // Salju se pitanja igracu
+            this.userOutput.writeObject(pair.getQucikQuestions());
+            // ovde treba da bude broj tacnih odgovora
+            Message msg = (Message) userInput.readObject();
+            int correctAnswers = Integer.parseInt(msg.getMessageText()),opponentAnswers;
+            boolean opponentFinished = this.pair.setPlayerCorrectAnswers(this.user.getUsername(),correctAnswers);
+            opponentAnswers = opponentFinished?this.pair.getOpponentsCorrectAnswers(this.user.getUsername()):waitFewSecondsMore();
+            this.sendAnswer(opponentAnswers+"");
+            // sada mu UH salje koliko tacnih ima protivnik, a na klijentskoj strani ce izracunati ko ima vise i ispisace poruku
+            // ovde se pokrece druga igra koja ce morati savki put da cima UH za svaki odgovor
+
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        catch(ClassNotFoundException e){
+            e.printStackTrace();
+        }
+        catch (TimeoutException te){
+            // NISU UPISANI ODGOVORI DRUGOG IGRACA (VEROVATNO JE IZASAO)
+        }
+        // sada igrac 60 sekundi odgovara na pitanja
+    }
+
+    private int waitFewSecondsMore() throws TimeoutException{
+        try {
+            this.sleep(5000);
+            return this.pair.getOpponentsCorrectAnswers(this.user.getUsername());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally {
+            throw new TimeoutException();
+        }
     }
 
     private void challenge(String opponentUsername) throws IOException, ClassNotFoundException {
