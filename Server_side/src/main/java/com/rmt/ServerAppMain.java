@@ -1,5 +1,6 @@
 package com.rmt;
 
+import com.rmt.controllers.GameHandler;
 import com.rmt.controllers.UserHandler;
 import com.rmt.domain.GamePair;
 import com.rmt.domain.Player;
@@ -27,7 +28,7 @@ public class ServerAppMain {
     public static void main(String[] args) {
         activePlayersMap = FXCollections.observableMap(new HashMap());
         offlinePlayersMap = FXCollections.observableMap(new HashMap());
-//        GamePair gp = new GamePair();
+        GameHandler gameHandler = new GameHandler();
         //addPlayersChangedListener();
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {

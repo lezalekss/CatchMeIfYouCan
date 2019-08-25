@@ -76,7 +76,7 @@ public class UserHandler extends Thread {
                             System.out.println("UH u startGame metodi\n");
                             // u start game izazivacev username mora da bude prvi, a ovaj koji je izazvan drugi,
                             // zbog pretrage u mapi u GameHandler klasi jer je to kljuc
-                            this.startGame(String.format("%s#%s",opponent.getUsername(),user.getUsername()));
+                            this.quickQuestionsScene(String.format("%s#%s",opponent.getUsername(),user.getUsername()));
                             break;
                         } else {
                             ServerAppMain.removePlayerFromOffline(user.getUsername());
@@ -102,7 +102,7 @@ public class UserHandler extends Thread {
                         }
                     }
                     case GAME_ACCEPTED:{
-                      this.startGame(String.format("%s#%s",user.getUsername(),msg.getMessageText()));
+                      this.quickQuestionsScene(String.format("%s#%s",user.getUsername(),msg.getMessageText()));
                     }
                     default:
                         this.sendError("Unexpected error");
@@ -132,7 +132,7 @@ public class UserHandler extends Thread {
         }
     }
 
-    private void startGame(String usernames) {
+    private void quickQuestionsScene(String usernames) {
         // startovanje prve igre
         this.pair = GameHandler.addPairToMap(usernames);
         try { // Salju se pitanja igracu
@@ -144,8 +144,18 @@ public class UserHandler extends Thread {
             opponentAnswers = opponentFinished?this.pair.getOpponentsCorrectAnswers(this.user.getUsername()):waitFewSecondsMore();
             this.sendAnswer(opponentAnswers+"");
             // sada mu UH salje koliko tacnih ima protivnik, a na klijentskoj strani ce izracunati ko ima vise i ispisace poruku
-            // ovde se pokrece druga igra koja ce morati savki put da cima UH za svaki odgovor
-
+            // ovde se pokrece druga igra koja ce <?xml version="1.0" encoding="UTF-8"?>
+            //
+            //<?import java.lang.*?>
+            //<?import javafx.scene.image.*?>
+            //
+            //
+            //<ImageView fitHeight="200.0" fitWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+            //   <image>
+            //      <Image url="file:/C:/Users/Clark/IdeaProjects/CatchMeIfYouCan_Client/src/client/resources/style/09b24e31234507.564a1d23c07b4.gif" />
+            //   </image>
+            //</ImageView>morati savki put da cima UH za svaki odgovor
+            this.chasingScene(usernames);
         }catch (IOException e){
             e.printStackTrace();
         }
@@ -156,6 +166,10 @@ public class UserHandler extends Thread {
             // NISU UPISANI ODGOVORI DRUGOG IGRACA (VEROVATNO JE IZASAO)
         }
         // sada igrac 60 sekundi odgovara na pitanja
+    }
+
+    private void chasingScene(String usernames){
+
     }
 
     private int waitFewSecondsMore() throws TimeoutException{
