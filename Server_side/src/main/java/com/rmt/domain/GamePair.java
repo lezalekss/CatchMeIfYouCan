@@ -13,6 +13,8 @@ public class GamePair {
         this.firstPlayer = users[0];
         this.secondPlayer = users[1];
         this.qucikQuestions = qucikQuestions;
+        this.firstPlayerCorrectAnswers = -1;
+        this.secondPlayerCorrectAnswers = -1;
     }
 
     public synchronized boolean setPlayerCorrectAnswers(String username, int correctAnswers){
@@ -35,13 +37,13 @@ public class GamePair {
 
     private boolean setFirstPlayerAnswers(int correctAnswers){
         this.firstPlayerCorrectAnswers=correctAnswers;
-        if(secondPlayerCorrectAnswers>0)
+        if(secondPlayerCorrectAnswers>-1)
             return true;
         else return false;
     }
     private boolean setSecondPlayerAnswers(int correctAnswers){
         this.secondPlayerCorrectAnswers=correctAnswers;
-        if(firstPlayerCorrectAnswers>0)
+        if(firstPlayerCorrectAnswers>-1)
             return true;
         else return false;
     }

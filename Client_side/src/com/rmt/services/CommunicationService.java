@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import com.rmt.domain.Question;
 import javafx.collections.ObservableSet;
 
 public class CommunicationService {
@@ -31,6 +33,11 @@ public class CommunicationService {
             serviceInstance = new CommunicationService();
         }
         return serviceInstance;
+    }
+
+    public Question[] loadQuickQuestions() {
+
+        return new Question[0];
     }
 
     public boolean connect() {

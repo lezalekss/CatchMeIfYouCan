@@ -27,7 +27,7 @@ public class ServerAppMain {
     public static void main(String[] args) {
         activePlayersMap = FXCollections.observableMap(new HashMap());
         offlinePlayersMap = FXCollections.observableMap(new HashMap());
-        GamePair gp = new GamePair();
+//        GamePair gp = new GamePair();
         //addPlayersChangedListener();
 
         try (ServerSocket serverSocket = new ServerSocket(port)) {

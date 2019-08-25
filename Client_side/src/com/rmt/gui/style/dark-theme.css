@@ -1,0 +1,56 @@
+* {
+    -fx-primary: #0d3e5e;
+    -fx-secondary: #E78200;
+    -fx-primary-text: #B2B2B2;
+    -fx-toggle-text: #ff9e1f;
+}
+
+.root{
+    /*-fx-background-image: url("backgroundUp.png");
+    -fx-background-size: 100% 100%;*/
+}
+
+.glyph-icon{
+    -fx-fill: -fx-primary-text;
+}
+
+.button{
+    -fx-text-fill: -fx-primary-text;
+}
+
+.start-button{
+    -fx-border-color: -fx-secondary;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -jfx-button-type: RAISED;
+}
+
+.jfx-progress-bar > .bar{
+    -fx-background-color: -fx-secondary;
+}
+
+.text-area *.text {
+    -fx-text-alignment: center;
+    -fx-text-fill: -fx-primary-text;
+}
+
+.text-area{
+    -fx-control-inner-background: -fx-primary;
+    -fx-border-color: -fx-primary-text;
+}
+
+.jfx-toggle-button{
+    -fx-text-fill: -fx-primary-text;
+    -jfx-toggle-color: -fx-secondary;
+}
+
+.jfx-text-field{
+    -fx-text-fill: -fx-primary-text;
+    -jfx-focus-color: -fx-secondary;
+    -fx-prompt-text-fill: -fx-primary-text;
+}
+
+.label{
+    -fx-text-fill: -fx-primary-text;
+}
+
