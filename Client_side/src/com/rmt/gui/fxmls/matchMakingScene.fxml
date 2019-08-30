@@ -9,39 +9,38 @@
 <?import com.sun.javafx.scene.control.skin.TableHeaderRow?>
 <?import com.jfoenix.controls.JFXListView?>
 <?import com.jfoenix.controls.JFXButton?>
+<?import javafx.geometry.Insets?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.rmt.gui.controllers.MatchMakingController"
-          alignment="CENTER" gridLinesVisible="true"
-          stylesheets="@../style/test-theme.css"
-          prefHeight="400.0" prefWidth="600.0">
+          alignment="CENTER" gridLinesVisible="false"
+          stylesheets="@../resources/test-theme.css"
+          vgap="20" prefHeight="400.0" prefWidth="600.0">
 
     <columnConstraints>
-        <ColumnConstraints percentWidth="40" halignment="CENTER"/>
+        <ColumnConstraints halignment="CENTER"/>
     </columnConstraints>
 
     <rowConstraints>
         <RowConstraints percentHeight="50" valignment="CENTER"/>
         <RowConstraints percentHeight="10" valignment="CENTER"/>
         <RowConstraints percentHeight="10" valignment="CENTER"/>
-        <RowConstraints percentHeight="20" valignment="CENTER"/>
+        <RowConstraints percentHeight="10" valignment="CENTER"/>
     </rowConstraints>
 
-    <JFXListView fx:id = "activePlayersListView" GridPane.rowIndex="0" GridPane.columnIndex="0" >
+    <JFXListView fx:id = "activePlayersListView" editable="false"  GridPane.rowIndex="0" GridPane.columnIndex="0"
+                    minWidth="300" maxWidth="300">
 
     </JFXListView>
 
 
-    <JFXButton fx:id="refreshButton" onAction="#onRefreshButtonClicked" text="REFRESH" styleClass="start-button"
+    <JFXButton fx:id="refreshButton" onAction="#onRefreshButtonClicked" text="REFRESH" styleClass="button-medium"
                GridPane.rowIndex="1" GridPane.columnIndex="0"/>
 
-    <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="start-button"
+    <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="button-medium"
                GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
-    <HBox GridPane.rowIndex="3" GridPane.columnIndex="0">
-        <JFXButton fx:id="challenging"  text="CHALLENGING" onAction="#switchToChallenging" styleClass="start-button"/>
-        <JFXButton fx:id="waitingForChallenge" onAction="#switchToWaitingForChallenge"  text="WAITING FOR CHALLENGE" styleClass="start-button"/>
-
-    </HBox>
+    <JFXButton fx:id="switchButton" onAction="#onSwitchButtonClicked" text="SWITCH TO CHALLENGING" styleClass="button-medium"
+               GridPane.rowIndex="3" GridPane.columnIndex="0"/>
 
 </GridPane>

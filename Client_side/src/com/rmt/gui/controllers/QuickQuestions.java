@@ -1,8 +1,6 @@
 package com.rmt.gui.controllers;
 
 import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXTextField;
-import com.jfoenix.controls.JFXToggleButton;
 import com.rmt.domain.Question;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
@@ -39,14 +37,15 @@ public class QuickQuestions implements Initializable {
     @FXML
     private TextArea questionText;
 
-    private Question[] questions;
-    private int currentIndex = 0;
-    private int seconds = 20;
-
     private CommunicationService communicationService = CommunicationService.getCommunicationServiceInstance();
     private StageService stageService = StageService.getStageServiceInstance();
 
+    private Question[] questions;
+    private int currentIndex = 0;
+    private int secondsForAnswering = 15;
+
     private int numberOfCorrectAnswers = 0;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.questionText.setFocusTraversable(false);
@@ -55,7 +54,7 @@ public class QuickQuestions implements Initializable {
 //        this.questions = communicationService.loadQuickQuestions();
         this.setTestQuestions();
         this.displayQuestion();
-        this.startTimer(seconds);
+        this.startTimer(secondsForAnswering);
     }
 
     private void startTimer(int seconds){
@@ -68,8 +67,10 @@ public class QuickQuestions implements Initializable {
         };
         countdown.setOnSucceeded(event -> {
             try {
-                stageService.changeScene("com/rmt/gui/fxmls/theChase.fxml", this.answerOne.getScene());
-                System.out.println(this.numberOfCorrectAnswers);
+                String roles = this.communicationService.getRoles(this.numberOfCorrectAnswers);
+                System.out.println(String.format("Roles received: %s", roles));
+                this.stageService.changeToChaseScene(this.answerOne.getScene(), roles);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -79,12 +80,13 @@ public class QuickQuestions implements Initializable {
     }
 
 
-    public void buttonClicked(ActionEvent event) {
+    public void answerButtonClicked(ActionEvent event) {
         JFXButton selectedButton = (JFXButton) event.getTarget();
         if(selectedButton.getText().equals(this.questions[currentIndex].getCorrectAnswer())){
             ++this.numberOfCorrectAnswers;
         }
         ++currentIndex;
+        System.out.println("Question graded");
         this.displayQuestion();
     }
 
@@ -93,9 +95,9 @@ public class QuickQuestions implements Initializable {
         Question question = this.questions[this.currentIndex];
 
         this.loadQuestionText(question);
-        this.loadClosedQuestion(question);
-
-        this.answerOne.setDisableVisualFocus(true);
+        this.loadQuestionAnswers(question);
+        System.out.println("Question displayed");
+//        this.answerOne.setDisableVisualFocus(true);
     }
 
     private void loadQuestionText(Question question) {
@@ -118,24 +120,24 @@ public class QuickQuestions implements Initializable {
         timeline.play();
     }
 
-    private void loadClosedQuestion(Question question) {
+    private void loadQuestionAnswers(Question question) {
         String[] answers = question.getPossibleAnswers();
-
+        //TODO shuffle
         this.answerOne.setText(answers[0]);
         this.answerTwo.setText(answers[1]);
         this.answerThree.setText(answers[2]);
         this.answerFour.setText(answers[3]);
 
-        this.showButtons();
+//        this.showButtons();
     }
 
 
-    private void showButtons() {
-        this.answerOne.setVisible(true);
-        this.answerTwo.setVisible(true);
-        this.answerThree.setVisible(true);
-        this.answerFour.setVisible(true);
-    }
+//    private void showButtons() {
+//        this.answerOne.setVisible(true);
+//        this.answerTwo.setVisible(true);
+//        this.answerThree.setVisible(true);
+//        this.answerFour.setVisible(true);
+//    }
 
     private void setTestQuestions(){
         this.questions= new Question[100];

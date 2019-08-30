@@ -29,9 +29,8 @@ public class MatchMakingController implements Initializable {
     JFXButton refreshButton;
 
     @FXML
-    JFXButton challenging;
-    @FXML
-    JFXButton waitingForChallenge;
+    JFXButton switchButton;
+
 
 
     private ObservableSet<String> activePlayersSet;
@@ -47,11 +46,12 @@ public class MatchMakingController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        challenging.setDisable(true);
+        this.switchButton.setText("SWITCH TO WAITING");
+//        challenging.setDisable(true);
 
         Set<String> receivedPlayers = this.communicationService.getActivePlayers();
 
-        if (receivedPlayers != null) {
+        if (receivedPlayers.size()>=0) {
 
             //wrap set with observable
             this.activePlayersSet = FXCollections.observableSet(receivedPlayers);
@@ -64,7 +64,6 @@ public class MatchMakingController implements Initializable {
         this.addSetChangedListener();
 
         this.addPlayerSelectedListener();
-
     }
 
 
@@ -73,7 +72,6 @@ public class MatchMakingController implements Initializable {
             Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete " + newValue.toString() + "?");
             Optional<ButtonType> answer = alert.showAndWait();
             if (answer.get() == ButtonType.OK) {
-                System.out.println("Izazvan \n");
 
                 boolean challengeSuccessful = this.communicationService.challengeOpponent(newValue.toString());
 
@@ -83,7 +81,8 @@ public class MatchMakingController implements Initializable {
                     return;
                 }else{
                     try {
-                        stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene());
+                        this.communicationService.tellServerToStartGame(newValue.toString());
+                        this.stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -97,73 +96,84 @@ public class MatchMakingController implements Initializable {
                     //this.activePlayersSet.remove(this.username);
                     this.activePlayersListView.getItems().clear();
                     this.activePlayersListView.getItems().setAll(this.activePlayersSet);
-                    System.out.println("Set updated in controller");
                 }
         );
     }
 
-    public void switchToWaitingForChallenge(ActionEvent event) {
+    public void onSwitchButtonClicked() {
+        if(this.switchButton.getText().equals("SWITCH TO WAITING")){
+            this.waitForChallenge();
 
-        this.waitToBeChallenged();
+            this.communicationService.tellServerToSwitchToWaiting();
 
-        this.communicationService.switchToWaitingForChallenge();
+            this.resetButtonForWaitingState();
 
-        this.activePlayersListView.setDisable(true);
-        this.refreshButton.setDisable(true);
-        this.challenging.setDisable(false);
-        this.waitingForChallenge.setDisable(true);
+            this.switchButton.setText("SWITCH TO CHALLENGING");
+
+        }else if(this.switchButton.getText().equals("SWITCH TO CHALLENGING")){
+
+            this.communicationService.tellServerToSwitchToChallenging();
+
+            this.switchButton.setText("SWITCH TO WAITING");
+        }
+
     }
 
-    private void waitToBeChallenged() {
+//    public void switchToChallenging() {
+//        this.communicationService.tellServerToSwitchToChallenging();
+//    }
+
+    private void resetButtonForWaitingState() {
+        this.activePlayersListView.setDisable(true);
+        this.refreshButton.setDisable(true);
+    }
+
+    // TODO preimenuj metodu
+    private void waitForChallenge() {
         WaitingTask waitingTask = new WaitingTask();
         waitingTask.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                this.challengerUsername = newValue;
-                this.challengeReceived();
+                if(newValue.equals("shutdown")){
+                    this.resetButtonsForChallengingState();
+                }else{
+                    this.challengerUsername = newValue;
+                    this.challengeReceived();
+                }
             }
         });
-        this.communicationService.waitToBeChallenged(waitingTask);
-
+        this.communicationService.startWaitingTask(waitingTask);
     }
 
-    public void switchToChallenging(ActionEvent event) {
-
-        this.communicationService.switchToChallenging();
-
-        this.activePlayersListView.setDisable(false);
-        this.refreshButton.setDisable(false);
-        this.challenging.setDisable(true);
-        this.waitingForChallenge.setDisable(false);
+    private void resetButtonsForChallengingState() {
+        activePlayersListView.setDisable(false);
+        refreshButton.setDisable(false);
     }
 
     private void challengeReceived() {
-        System.out.println("Contoler uvaio challenge received da je true");
 
-        this.refreshButton.setVisible(true);
-        this.logOutButton.setDisable(true);
-        this.activePlayersListView.setDisable(true);
+//        this.refreshButton.setDisable(true);
+//        this.logOutButton.setDisable(true);
+//        this.activePlayersListView.setDisable(true);
 
-        System.out.println("izgasio dugmice");
 
         boolean accepted = this.showChallengeReceivingDialog(this.challengerUsername);
 
-        System.out.println("Izazov prihvacen? " + accepted);
 
         if (accepted) {
             this.communicationService.challengeAccepted(this.challengerUsername);
             try {
-                stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene());
+                stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             this.communicationService.challengeRejected(this.challengerUsername);
 
-            this.refreshButton.setDisable(false);
-            this.logOutButton.setDisable(false);
-            this.activePlayersListView.setDisable(false);
+//            this.refreshButton.setDisable(false);
+//            this.logOutButton.setDisable(false);
+//            this.activePlayersListView.setDisable(false);
 
-            this.waitToBeChallenged();
+            this.waitForChallenge();
         }
     }
 
@@ -192,8 +202,9 @@ public class MatchMakingController implements Initializable {
         else return false;
     }
 
-    public void onLogoutButtonClicked(ActionEvent event) {
+    public void onLogoutButtonClicked(ActionEvent event) throws IOException {
         this.communicationService.logout();
+        this.stageService.changeScene("com/rmt/gui/fxmls/login.fxml", event);
     }
 
     public void onRefreshButtonClicked(ActionEvent event) {

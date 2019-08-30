@@ -1,0 +1,140 @@
+@font-face{
+    font-family: 'Montserrat';
+    src: url('Montserrat.ttf');
+}
+
+* {
+  -fx-primary: #265687;
+  -fx-secondary: #d2d7f7;
+  -fx-light-blue: #547e9e;
+
+}
+
+.root{
+    -fx-background-color: #539fdb,
+                          linear-gradient(#cce0f0, #8bc3f0),
+                          linear-gradient(#a4ceed, #2f4b8f);
+
+    -fx-font-family: Courier New;
+}
+
+
+.glyph-icon{
+    -fx-fill: -fx-secondary;
+}
+
+.button-large{
+    -fx-padding: 10;
+    -fx-border-color: -fx-secondary;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -jfx-button-type: RAISED;
+    -fx-font-size: 30px;
+    -fx-text-fill: -fx-secondary;
+}
+
+.button-large:hover, .button-large:hover{
+    -fx-border-color: rgb(210,215,247,0.5);
+    -fx-background-color: rgb(210,215,247,0.5);
+    -fx-text-fill: -fx-primary;
+}
+
+.button-medium{
+    -fx-padding: 10;
+    -fx-border-color: -fx-secondary;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -jfx-button-type: RAISED;
+    -fx-font-size: 24px;
+    -fx-text-fill: -fx-secondary;
+}
+
+.button-medium:hover, .button-medium:hover{
+    -fx-border-color: rgb(210,215,247,0.5);
+    -fx-background-color: rgb(210,215,247,0.5);
+    -fx-text-fill: -fx-primary;
+}
+
+.jfx-text-field{
+    -fx-text-fill: -fx-secondary;
+    -jfx-focus-color: -fx-primary;
+    -jfx-unfocus-color: -fx-primary;
+    -fx-prompt-text-fill: -fx-secondary;
+    -fx-font-size: 18;
+}
+
+/*.jfx-list-view{
+     -fx-background-color: transparent;
+     -fx-background-insets: 0,1 ;
+}
+
+#activePlayersListView .list-cell:empty{
+    -fx-background-color: transparent;
+}
+
+#activePlayersListView .jfx-list-cell:selected:focused{
+    -fx-background-color: -fx-light-blue;
+    -fx-text-fill: -fx-secondary;
+    -fx-text-alignment: center;
+    -fx-font-family: Liberation Sans;
+    -fx-font-size: 16;
+}*/
+
+
+
+.chase-step-blue {
+    -fx-focus-traversable:false;
+    -fx-opacity: 1.0;
+    -fx-min-width: 350;
+    -fx-min-height: 50;
+    -fx-background-color:
+            #000000,
+            linear-gradient(#7ebcea, #2f4b8f),
+            linear-gradient(#426ab7, #263e75),
+            linear-gradient(#395cab, #223768);
+        -fx-background-insets: 0,1,2,3;
+        -fx-background-radius: 3,2,2,2;
+        -fx-padding: 12 30 12 30;
+        -fx-text-fill: -fx-secondary;
+        -fx-font-size: 12pt;
+        -fx-alignment: center;
+}
+
+.chase-step-red{
+    -fx-min-width: 350;
+    -fx-min-height: 50;
+    -fx-background-color:
+            #000000,
+            linear-gradient(#ea7e7e, #8f2f2f),
+            linear-gradient(#b74242, #752626),
+            linear-gradient(#ab3939, #682222);
+        -fx-background-insets: 0,1,2,3;
+        -fx-background-radius: 3,2,2,2;
+        -fx-padding: 12 30 12 30;
+        -fx-text-fill: -fx-secondary;
+        -fx-font-size: 12pt;
+        -fx-alignment: center;
+
+}
+
+.answer-button{
+    -fx-text-fill: -fx-secondary;
+    -fx-font-size: 14pt;
+}
+
+.text-area, .text-area .viewport, .text-area .content {
+    -fx-background-color: transparent ;
+    -fx-text-fill: -fx-secondary;
+    -fx-font-size: 14pt;
+}
+
+.text-area{
+    -fx-border-color: -fx-secondary;
+    -fx-border-width: 0;
+    -fx-border-radius: 6px;
+}
+
+.text-area *.text{
+    -fx-text-alignment: center;
+    -fx-font-family: Courier New;
+}

@@ -1,8 +1,10 @@
 package com.rmt.gui.controllers;
 
+import com.jfoenix.controls.JFXButton;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 
@@ -15,12 +17,15 @@ public class StartSceneController implements Initializable {
     private CommunicationService communicationService;
     private StageService stageService;
 
-//    @FXML JFXButton quitButton;
+    @FXML
+    JFXButton connectButton;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.communicationService = CommunicationService.getCommunicationServiceInstance();
         this.stageService = StageService.getStageServiceInstance();
+
+        this.connectButton.setDisableVisualFocus(true);
     }
 
     public void onConnectButtonClicked(ActionEvent event){

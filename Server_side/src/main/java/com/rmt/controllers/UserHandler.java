@@ -5,6 +5,7 @@ import com.rmt.ServerAppMain;
 import com.rmt.domain.GamePair;
 import com.rmt.domain.Message;
 import com.rmt.domain.Player;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -20,8 +21,9 @@ public class UserHandler extends Thread {
     private ObjectInputStream userInput;
     private ObjectOutputStream userOutput;
 
-    private GamePair pair;
+    private GamePair gamePair;
     private DBConnection dbConn;
+    private String opponentUsername;
 
     public UserHandler(Socket socket) {
         user = new Player(socket);
@@ -55,28 +57,23 @@ public class UserHandler extends Thread {
                         break;
                     }
                     case PLAY_WITH: {
-                        System.out.println("UH: PW primljen\n");
                         //svakako je neaktivan ko izaziva
                         // ServerAppMain.removePlayerFromActive(this.user.getUsername());
                         this.challenge(msg.getMessageText());
                         break;
                     }
                     case CHALLENGE_ANSWER: {
-                        System.out.println("UH izvaznog od izazvanog klijenta primio odg\n");
-
                         String[] messageText = msg.getMessageText().split("\n");
 
-                        Player opponent = ServerAppMain.findOfflinePlayer(messageText[1]);
-                        ObjectOutputStream challengerOutput = opponent.getUserOutput();
+                        Player challenger = ServerAppMain.findOfflinePlayer(messageText[1]);
+                        ObjectOutputStream challengerOutput = challenger.getUserOutput();
                         challengerOutput.writeObject(new Message(Message.MessageType.ANSWERS, messageText[0]));
 
-                        System.out.println("UH posledio odg CS-u izazivaca\n");
-
                         if (messageText[0].equals("YES")) {
-                            System.out.println("UH u startGame metodi\n");
                             // u start game izazivacev username mora da bude prvi, a ovaj koji je izazvan drugi,
                             // zbog pretrage u mapi u GameHandler klasi jer je to kljuc
-                            this.quickQuestionsScene(String.format("%s#%s",opponent.getUsername(),user.getUsername()));
+                            this.opponentUsername = messageText[1];
+                            this.startGame(String.format("%s#%s", challenger.getUsername(), user.getUsername()));
                             break;
                         } else {
                             ServerAppMain.removePlayerFromOffline(user.getUsername());
@@ -85,7 +82,9 @@ public class UserHandler extends Thread {
                         }
                     }
                     case LOG_OUT: {
-
+                        this.user.setUsername(null);
+                        this.user.setStatus(Player.PlayerStatus.OFFLINE);
+                        break;
                     }
                     case SWITCH: {
                         if (msg.getMessageText().equals("TO WAITING")) {
@@ -101,8 +100,11 @@ public class UserHandler extends Thread {
                             break;
                         }
                     }
-                    case GAME_ACCEPTED:{
-                      this.quickQuestionsScene(String.format("%s#%s",user.getUsername(),msg.getMessageText()));
+                    case GAME_ACCEPTED: {
+                        //starts method for game managing for challenger, message text is challenged username
+                        this.opponentUsername = msg.getMessageText();
+                        this.startGame(String.format("%s#%s", user.getUsername(), this.opponentUsername));
+                        break;
                     }
                     default:
                         this.sendError("Unexpected error");
@@ -111,17 +113,17 @@ public class UserHandler extends Thread {
             }
         } catch (java.io.EOFException e) {
             //kad kliknem na x u klijentu iskoci ovo
-            if(user.getStatus()== Player.PlayerStatus.ACTIVE){
+            if (user.getStatus() == Player.PlayerStatus.ACTIVE) {
                 ServerAppMain.removePlayerFromActive(user.getUsername());
-            }else{
+            } else {
                 ServerAppMain.removePlayerFromOffline(user.getUsername());
             }
             System.out.println("Player " + user.getUsername() + " just exited");
         } catch (SocketException e) {
             //e.printStackTrace(); // client shuts down
-            if(user.getStatus()== Player.PlayerStatus.ACTIVE){
+            if (user.getStatus() == Player.PlayerStatus.ACTIVE) {
                 ServerAppMain.removePlayerFromActive(user.getUsername());
-            }else{
+            } else {
                 ServerAppMain.removePlayerFromOffline(user.getUsername());
             }
             System.out.println("Player " + user.getUsername() + " just exited");
@@ -132,55 +134,59 @@ public class UserHandler extends Thread {
         }
     }
 
-    private void quickQuestionsScene(String usernames) {
+    private void startGame(String usernames) throws IOException, ClassNotFoundException {
         // startovanje prve igre
-        this.pair = GameHandler.addPairToMap(usernames);
-        try { // Salju se pitanja igracu
-            this.userOutput.writeObject(pair.getQucikQuestions());
-            // ovde treba da bude broj tacnih odgovora
-            Message msg = (Message) userInput.readObject();
-            int correctAnswers = Integer.parseInt(msg.getMessageText()),opponentAnswers;
-            boolean opponentFinished = this.pair.setPlayerCorrectAnswers(this.user.getUsername(),correctAnswers);
-            opponentAnswers = opponentFinished?this.pair.getOpponentsCorrectAnswers(this.user.getUsername()):waitFewSecondsMore();
-            this.sendAnswer(opponentAnswers+"");
-            // sada mu UH salje koliko tacnih ima protivnik, a na klijentskoj strani ce izracunati ko ima vise i ispisace poruku
-            // ovde se pokrece druga igra koja ce <?xml version="1.0" encoding="UTF-8"?>
-            //
-            //<?import java.lang.*?>
-            //<?import javafx.scene.image.*?>
-            //
-            //
-            //<ImageView fitHeight="200.0" fitWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-            //   <image>
-            //      <Image url="file:/C:/Users/Clark/IdeaProjects/CatchMeIfYouCan_Client/src/client/resources/style/09b24e31234507.564a1d23c07b4.gif" />
-            //   </image>
-            //</ImageView>morati savki put da cima UH za svaki odgovor
-            this.chasingScene(usernames);
-        }catch (IOException e){
+        this.gamePair = GameHandler.addPairToMap(usernames);
+        System.out.println("UH: Game started and pair created\n");
+        try {
+            while (true) {
+                Message msg = (Message) this.userInput.readObject();
+                switch (msg.getType()) {
+                    case GET_QUICK_QUESTIONS: {
+                        this.userOutput.writeObject(this.gamePair.getQuickQuestions());
+                        break;
+                    }
+                    case SET_CORRECT_ANSWERS: {
+                        int correctAnswers = Integer.parseInt(msg.getMessageText()), opponentAnswers;
+                        System.out.println(user.getUsername()+"'s UH received "+correctAnswers+" correct answers");
+
+                        boolean opponentFinished = this.gamePair.setPlayerCorrectAnswers(this.user.getUsername(), correctAnswers);
+                        System.out.println(user.getUsername()+"'s Opponent "+opponentUsername+" finished: "+opponentFinished);
+
+                        opponentAnswers = opponentFinished ? this.gamePair.getOpponentsCorrectAnswers(this.user.getUsername()) : waitFewSecondsMore();
+                        System.out.println(user.getUsername()+"'s UH: opponents answers "+opponentAnswers);
+
+                        if(correctAnswers > opponentAnswers){
+                            this.sendAnswer(this.user.getUsername()+"#"+this.opponentUsername);
+                            break;
+                        }else if(opponentAnswers > correctAnswers){
+                            this.sendAnswer(this.opponentUsername+"#"+this.user.getUsername());
+                            break;
+                        }else{
+                            //ako imaju jednako poena, challenger je chaser
+                            this.sendAnswer(usernames);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
             e.printStackTrace();
-        }
-        catch(ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }
-        catch (TimeoutException te){
+        } catch (TimeoutException te) {
             // NISU UPISANI ODGOVORI DRUGOG IGRACA (VEROVATNO JE IZASAO)
         }
-        // sada igrac 60 sekundi odgovara na pitanja
     }
-
-    private void chasingScene(String usernames){
-
-    }
-
-    private int waitFewSecondsMore() throws TimeoutException{
+    private int waitFewSecondsMore() throws TimeoutException {
         try {
-            this.sleep(5000);
-            return this.pair.getOpponentsCorrectAnswers(this.user.getUsername());
+            this.sleep(300);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }finally {
-            throw new TimeoutException();
+        } finally {
+//            throw new TimeoutException();
         }
+        return this.gamePair.getOpponentsCorrectAnswers(this.user.getUsername());
     }
 
     private void challenge(String opponentUsername) throws IOException, ClassNotFoundException {
@@ -193,25 +199,25 @@ public class UserHandler extends Thread {
         //ako ga izazivam menjam mu status da ga ne izazove neko drugi, ako odbije da mu vratim status
 
         Player opponent = ServerAppMain.findActivePlayer(opponentUsername);
-        System.out.println("Naso protivnika u mapi\n");
+//        System.out.println("Naso protivnika u mapi\n");
 
         ServerAppMain.removePlayerFromActive(opponentUsername);
         ServerAppMain.addToOfflinePlayers(opponent);
 
-        System.out.println("UH stavio izvanog u neaktivne");
+//        System.out.println("UH stavio izvanog u neaktivne");
 
         ObjectOutputStream opponentOutput = opponent.getUserOutput();
 
-        System.out.println("UH: naso za izazvanog strimove");
+//        System.out.println("UH: naso za izazvanog strimove");
 
         opponentOutput.writeObject(new Message(Message.MessageType.PLAY_WITH, user.getUsername()));
         opponentOutput.flush();
 
-        System.out.println("UH poslo izvanom pw\n");
+//        System.out.println("UH poslo izvanom pw\n");
     }
 
 
-    private void sendActivePlayers() throws IOException, ClassNotFoundException {
+    private void sendActivePlayers() throws IOException {
         HashSet<String> players = ServerAppMain.getOnlinePlayers();
         players.remove(user.getUsername());
         this.userOutput.writeObject(players);
@@ -232,8 +238,6 @@ public class UserHandler extends Thread {
 
         this.userOutput.writeObject(players);
         this.userOutput.flush();
-
-        System.out.println("Players sent\n");
 
 //       #TODO POPRAVI OVO
         //ServerAppMain.addToActivePlayers(this.user);
@@ -265,20 +269,6 @@ public class UserHandler extends Thread {
         user.setUsername(userAndPass[0]);
         user.setStatus(Player.PlayerStatus.OFFLINE);
         ServerAppMain.addToOfflinePlayers(user);
-    }
-
-    private void inGameScene(String username) {
-//        List<String> onlinePlayers = ServerAppMain.getOnlinePlayers().stream().map(Player::getUsername).collect(Collectors.toList());
-//        user.setStatus(Player.PlayerStatus.ACTIVE);
-//        user.setUsername(username);
-//        try {
-//            userOutput.writeObject(onlinePlayers);
-//            Message msg = (Message)userInput.readObject(); // U OVOJ PORUCI CE BITI USER SA KOJIM HOCE DA SE POVEZE
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
     }
 
     private void sendError(String messageText) throws IOException {

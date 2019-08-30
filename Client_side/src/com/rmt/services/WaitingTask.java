@@ -41,7 +41,7 @@ public class WaitingTask extends Task<String> {
                 } else if (msg.getType() == Message.MessageType.ANSWERS && msg.getMessageText().equals("STOP")) {
 
                     System.out.println("CW primio stop i gasi se\n");
-                    return null;
+                    return "shutdown";
                 }
             }else {
                 

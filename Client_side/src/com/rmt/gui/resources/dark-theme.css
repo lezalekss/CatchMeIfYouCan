@@ -18,11 +18,23 @@
     -fx-text-fill: -fx-primary-text;
 }
 
+/*TODO kad se hoveruje da se oboji u belo a slova u plavo*/
+.button:hover, .button:focused{
+    -fx-background-color: -fx-secondary;
+    -fx-text-fill: -fx-light-blue;
+}
+
 .start-button{
     -fx-border-color: -fx-secondary;
-    -fx-border-radius: 5px;
+    -fx-border-radius: 10px;
     -fx-background-radius: 5px;
     -jfx-button-type: RAISED;
+
+}
+
+.start-button:hover, .start-button:focused{
+    -fx-background-color: -fx-secondary;
+    -fx-text-fill: -fx-light-blue;
 }
 
 .jfx-progress-bar > .bar{

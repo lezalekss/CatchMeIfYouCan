@@ -1,48 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.image.Image?>
 <?import com.jfoenix.controls.JFXButton?>
-<GridPane alignment="CENTER" gridLinesVisible="true" stylesheets="@../style/test-theme.css" xmlns="http://javafx.com/javafx"
-          xmlns:fx="http://javafx.com/fxml"
-          fx:controller="com.rmt.gui.controllers.StartSceneController"
-          prefHeight="400.0" prefWidth="600.0" vgap="20">
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<GridPane gridLinesVisible="false" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" stylesheets="@../resources/test-theme.css" vgap="30.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmt.gui.controllers.StartSceneController">
     <!--<VBox.margin>-->
     <!--<Insets top="5" right="5" left="5" bottom="5"/>-->
     <!--</VBox.margin>-->
 
     <columnConstraints>
-        <ColumnConstraints halignment="CENTER" percentWidth="50"/>
+        <ColumnConstraints halignment="CENTER" percentWidth="60" />
     </columnConstraints>
 
     <rowConstraints>
-        <RowConstraints valignment="CENTER" percentHeight="40"/>
-        <RowConstraints valignment="CENTER" percentHeight="10"/>
-        <RowConstraints valignment="CENTER" percentHeight="10"/>
+        <RowConstraints percentHeight="30" valignment="CENTER" />
+        <RowConstraints percentHeight="10" valignment="CENTER" />
+        <RowConstraints percentHeight="10" valignment="CENTER" />
     </rowConstraints>
 
-    <ImageView pickOnBounds="true" preserveRatio="true" GridPane.rowIndex="0" GridPane.columnIndex="0"
-               GridPane.columnSpan="2">
-        <!--#TODO stavi logo-->
-        <!--<image>-->
-            <!--<Image/>-->
-        <!--</image>-->
+    <ImageView fitHeight="180" fitWidth="300" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <image>
+            <Image url="@../resources/logo.png" />
+        </image>
     </ImageView>
 
-    <!--<padding>-->
-        <!--<Insets top="20" right="20" bottom="20" left="20"/>-->
-    <!--</padding>-->
-
-    <!--#TODO Add style class for start buttons-->
-    <JFXButton fx:id="connectButton" onAction="#onConnectButtonClicked" styleClass="start-button" text="CONNECT" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-    <JFXButton fx:id="quitButton" onAction="#onQuitButtonClicked" styleClass="start-button" text="QUIT" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+    <JFXButton fx:id="connectButton" onAction="#onConnectButtonClicked" styleClass="button-large" text="CONNECT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+    <JFXButton fx:id="quitButton" onAction="#onQuitButtonClicked" styleClass="button-large" text="QUIT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
 
 
 </GridPane>
