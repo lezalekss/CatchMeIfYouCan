@@ -122,7 +122,8 @@ public class QuickQuestions implements Initializable {
 
     private void loadQuestionAnswers(Question question) {
         String[] answers = question.getPossibleAnswers();
-        //TODO shuffle
+        Collections.shuffle(Arrays.asList(answers));
+
         this.answerOne.setText(answers[0]);
         this.answerTwo.setText(answers[1]);
         this.answerThree.setText(answers[2]);
