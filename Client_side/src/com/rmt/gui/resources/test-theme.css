@@ -18,6 +18,11 @@
     -fx-font-family: Courier New;
 }
 
+*.text{
+    -fx-effect: dropshadow( gaussian, rgba(51,51,51), 5, 0.1, 1, 1);
+    -fx-stroke: rgba(51,51,51);
+    -fx-stroke-width: 0.1;
+}
 
 .glyph-icon{
     -fx-fill: -fx-secondary;
@@ -35,8 +40,16 @@
 
 .button-large:hover, .button-large:hover{
     -fx-border-color: rgb(210,215,247,0.5);
-    -fx-background-color: rgb(210,215,247,0.5);
+    -fx-background-color: rgb(210,215,247,0.7);
     -fx-text-fill: -fx-primary;
+    -fx-stroke: -fx-secondary;
+    -fx-stroke-width: 0.1;
+}
+
+.button-large:hover, .button-large:hover *.text{
+    -fx-stroke: -fx-secondary;
+    -fx-stroke-width: 0.1;
+    -fx-effect: dropshadow( gaussian, rgb(24, 54, 84), 3, 0.1, 1, 1);
 }
 
 .button-medium{
@@ -51,17 +64,28 @@
 
 .button-medium:hover, .button-medium:hover{
     -fx-border-color: rgb(210,215,247,0.5);
-    -fx-background-color: rgb(210,215,247,0.5);
+    -fx-background-color: rgb(210,215,247,0.7);
     -fx-text-fill: -fx-primary;
+    -fx-stroke: -fx-secondary;
+    -fx-stroke-width: 0.1;
+}
+
+.button-medium:hover, .button-medium:hover *.text{
+    -fx-stroke: -fx-secondary;
+    -fx-stroke-width: 0.1;
+    -fx-effect: dropshadow( gaussian, rgb(24, 54, 84), 3, 0.1, 1, 1);
+
 }
 
 .jfx-text-field{
     -fx-text-fill: -fx-secondary;
     -jfx-focus-color: -fx-primary;
-    -jfx-unfocus-color: -fx-primary;
+    -jfx-unfocus-color: -fx-secondary;
     -fx-prompt-text-fill: -fx-secondary;
     -fx-font-size: 18;
 }
+
+
 
 /*.jfx-list-view{
      -fx-background-color: transparent;
@@ -94,10 +118,17 @@
             linear-gradient(#395cab, #223768);
         -fx-background-insets: 0,1,2,3;
         -fx-background-radius: 3,2,2,2;
-        -fx-padding: 12 30 12 30;
-        -fx-text-fill: -fx-secondary;
-        -fx-font-size: 12pt;
+        -fx-text-fill: #f7f2f2;
         -fx-alignment: center;
+
+}
+
+.chase-step-blue *.text{
+        -fx-font-size: 30px;
+        -fx-font-weight: bold;
+        -fx-effect: dropshadow( gaussian, rgba(51,51,51), 6, 0.5, 1, 1);
+        -fx-stroke: rgba(51,51,51);
+        -fx-stroke-width: 0.5;
 }
 
 .chase-step-red{
@@ -110,11 +141,16 @@
             linear-gradient(#ab3939, #682222);
         -fx-background-insets: 0,1,2,3;
         -fx-background-radius: 3,2,2,2;
-        -fx-padding: 12 30 12 30;
-        -fx-text-fill: -fx-secondary;
-        -fx-font-size: 12pt;
         -fx-alignment: center;
+        -fx-text-fill: #f7f2f2;
+}
 
+.chase-step-red *.text{
+        -fx-font-size: 30px;
+        -fx-font-weight: bold;
+        -fx-effect: dropshadow( gaussian, rgba(51,51,51), 6, 0.5, 1, 1);
+        -fx-stroke: rgba(51,51,51);
+        -fx-stroke-width: 0.5;
 }
 
 .answer-button{
@@ -137,4 +173,23 @@
 .text-area *.text{
     -fx-text-alignment: center;
     -fx-font-family: Courier New;
+}
+#timerLabel{
+    -fx-text-fill: -fx-secondary;
+    -fx-font-size: 24pt;
+    -fx-background-radius: 60px;
+    -fx-background-insets: -20px;
+    -fx-border-color: -fx-secondary;
+    -fx-border-width: 0;
+    -fx-background-color: rgb(210,215,247,0.3);
+}
+
+.progress-indicator{
+    -fx-progress-color: -fx-secondary;
+}
+
+#gameFinishedMessage{
+    -fx-font-size: 50px;
+    -fx-text-fill: -fx-secondary;
+    -fx-text-alignment: center;
 }

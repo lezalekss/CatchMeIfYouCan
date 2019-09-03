@@ -2,6 +2,8 @@
 
 <?import com.jfoenix.controls.JFXButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.effect.Blend?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -9,61 +11,63 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Label?>
 
-<GridPane alignment="CENTER" gridLinesVisible="false" prefHeight="800.0"
-          prefWidth="800.0" stylesheets="@../resources/test-theme.css"
-          xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="com.rmt.gui.controllers.TheChaseController">
+<GridPane alignment="CENTER" gridLinesVisible="false" prefHeight="800.0" prefWidth="800.0" stylesheets="@../resources/test-theme.css" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmt.gui.controllers.TheChaseController">
 
-    <VBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="0">
-        <Label fx:id="first" styleClass="chase-step-red"/>
-        <Label fx:id="second" styleClass="chase-step-blue"/>
-        <Label fx:id="third" styleClass="chase-step-blue"/>
-        <Label fx:id="fourth" styleClass="chase-step-blue"/>
-        <Label fx:id="fifth" styleClass="chase-step-blue"/>
-        <Label fx:id="sixth" styleClass="chase-step-blue"/>
-        <Label fx:id="seventh" styleClass="chase-step-blue"/>
-        <Label fx:id="eighth" styleClass="chase-step-blue"/>
-        <Label fx:id="ninth" styleClass="chase-step-blue"/>
+    <VBox fx:id="step" alignment="CENTER" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0">
+        <Label fx:id="first" styleClass="chase-step-red" />
+        <Label fx:id="second" styleClass="chase-step-blue" />
+        <Label fx:id="third" styleClass="chase-step-blue" />
+        <Label fx:id="fourth" styleClass="chase-step-blue" />
+        <Label fx:id="fifth" styleClass="chase-step-blue" />
+        <Label fx:id="sixth" styleClass="chase-step-blue" />
+        <Label fx:id="seventh" styleClass="chase-step-blue" />
+        <Label fx:id="eighth" styleClass="chase-step-blue" />
+        <Label fx:id="ninth" styleClass="chase-step-blue" />
     </VBox>
 
-    <VBox alignment="CENTER" GridPane.columnIndex="0" GridPane.rowIndex="1" spacing="10">
-        <TextArea fx:id="questionText"
-                  editable="false" prefHeight="200.0" prefWidth="400.0" wrapText="true">
+    <VBox fx:id="question" alignment="CENTER" spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="1">
+        <TextArea fx:id="questionText" editable="false" prefHeight="200.0" prefWidth="400.0" wrapText="true">
             <effect>
-                <Blend/>
+                <Blend />
             </effect>
         </TextArea>
         <HBox alignment="CENTER" spacing="10">
-            <JFXButton fx:id="answerOne" styleClass="answer-button" mnemonicParsing="false"
-                       onAction="#buttonClicked" text="Tripoli"
-                       wrapText="true" HBox.hgrow="ALWAYS"/>
-            <JFXButton fx:id="answerTwo" styleClass="answer-button" mnemonicParsing="false"
-                       onAction="#buttonClicked" text="Ankara"
-                       wrapText="true" HBox.hgrow="ALWAYS"/>
-            <JFXButton fx:id="answerThree" styleClass="answer-button" mnemonicParsing="false"
-                       onAction="#buttonClicked" text="Istanbul"
-                       wrapText="true" HBox.hgrow="ALWAYS"/>
+            <JFXButton fx:id="answerOne" mnemonicParsing="false" onAction="#buttonClicked" styleClass="answer-button" text="Tripoli" wrapText="true" HBox.hgrow="ALWAYS" />
+            <JFXButton fx:id="answerTwo" mnemonicParsing="false" onAction="#buttonClicked" styleClass="answer-button" text="Ankara" wrapText="true" HBox.hgrow="ALWAYS" />
+            <JFXButton fx:id="answerThree" mnemonicParsing="false" onAction="#buttonClicked" styleClass="answer-button" text="Istanbul" wrapText="true" HBox.hgrow="ALWAYS" />
         </HBox>
-
+        
         <padding>
-            <Insets bottom="20" top="20"/>
+            <Insets bottom="20.0" top="20.0" />
         </padding>
 
     </VBox>
 
+    <Label fx:id="timerLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+    <ProgressIndicator fx:id="progressIndicator" mouseTransparent="true" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+        <GridPane.margin>
+            <Insets bottom="20.0" top="20.0" />
+        </GridPane.margin>
+    </ProgressIndicator>
+
+
+    <Label fx:id="gameFinishedMessage" wrapText="true" alignment="center"
+           GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0" GridPane.rowSpan="2"/>
+
     <columnConstraints>
-        <ColumnConstraints halignment="CENTER"/>
+        <ColumnConstraints halignment="CENTER" />
+        <ColumnConstraints halignment="CENTER" percentWidth="10" />
     </columnConstraints>
 
     <rowConstraints>
-        <RowConstraints/>
-        <RowConstraints percentHeight="30"/>
+        <RowConstraints />
+        <RowConstraints percentHeight="30" />
     </rowConstraints>
 
     <padding>
-        <Insets top="50" bottom="30"/>
+        <Insets bottom="30" top="50" />
     </padding>
 
 </GridPane>

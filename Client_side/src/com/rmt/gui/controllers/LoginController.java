@@ -35,6 +35,7 @@ public class LoginController implements Initializable {
 
     public void onRegisterButtonClicked(ActionEvent event){
         String username = this.username.getText();
+        System.out.println(username);
         String password = this.password.getText();
         boolean registrationSuccessful = this.communicationService.register(username, password);
         if(registrationSuccessful){

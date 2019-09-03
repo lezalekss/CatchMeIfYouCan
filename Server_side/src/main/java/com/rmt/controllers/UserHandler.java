@@ -5,6 +5,7 @@ import com.rmt.ServerAppMain;
 import com.rmt.domain.GamePair;
 import com.rmt.domain.Message;
 import com.rmt.domain.Player;
+import com.sun.security.ntlm.Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,6 +25,7 @@ public class UserHandler extends Thread {
     private GamePair gamePair;
     private DBConnection dbConn;
     private String opponentUsername;
+    private ObjectOutputStream opponentOutputStream;
 
     public UserHandler(Socket socket) {
         user = new Player(socket);
@@ -73,7 +75,8 @@ public class UserHandler extends Thread {
                             // u start game izazivacev username mora da bude prvi, a ovaj koji je izazvan drugi,
                             // zbog pretrage u mapi u GameHandler klasi jer je to kljuc
                             this.opponentUsername = messageText[1];
-                            this.startGame(String.format("%s#%s", challenger.getUsername(), user.getUsername()));
+                            this.opponentOutputStream = challengerOutput;
+                            this.startGame(String.format("%s#%s", challenger.getUsername(), user.getUsername()), false);
                             break;
                         } else {
                             ServerAppMain.removePlayerFromOffline(user.getUsername());
@@ -103,7 +106,8 @@ public class UserHandler extends Thread {
                     case GAME_ACCEPTED: {
                         //starts method for game managing for challenger, message text is challenged username
                         this.opponentUsername = msg.getMessageText();
-                        this.startGame(String.format("%s#%s", user.getUsername(), this.opponentUsername));
+                        this.opponentOutputStream = ServerAppMain.findOfflinePlayer(opponentUsername).getUserOutput();
+                        this.startGame(String.format("%s#%s", user.getUsername(), this.opponentUsername), true);
                         break;
                     }
                     default:
@@ -134,7 +138,7 @@ public class UserHandler extends Thread {
         }
     }
 
-    private void startGame(String usernames) throws IOException, ClassNotFoundException {
+    private void startGame(String usernames, boolean isThisChallenger) throws IOException, ClassNotFoundException {
         // startovanje prve igre
         this.gamePair = GameHandler.addPairToMap(usernames);
         System.out.println("UH: Game started and pair created\n");
@@ -157,17 +161,30 @@ public class UserHandler extends Thread {
                         System.out.println(user.getUsername()+"'s UH: opponents answers "+opponentAnswers);
 
                         if(correctAnswers > opponentAnswers){
-                            this.sendAnswer(this.user.getUsername()+"#"+this.opponentUsername);
+                            this.sendAnswer(this.user.getUsername()+"#"+this.opponentUsername
+                                            +"\n"+true+"#"+"false");
                             break;
                         }else if(opponentAnswers > correctAnswers){
-                            this.sendAnswer(this.opponentUsername+"#"+this.user.getUsername());
+                            this.sendAnswer(this.opponentUsername+"#"+this.user.getUsername()
+                                            +"\n"+false+"#"+true);
                             break;
                         }else{
                             //ako imaju jednako poena, challenger je chaser
-                            this.sendAnswer(usernames);
+                            this.sendAnswer(usernames+"\n"+isThisChallenger+"#"+!isThisChallenger);
                             break;
                         }
                     }
+                    case GET_CHASE_QUESTIONS: {
+                        //#TODO
+
+                        break;
+                    }
+                    case EXCHANGE_ANSWERS:{
+                        this.opponentOutputStream.writeObject(msg);
+                        break;
+                    }
+                    case GAME_FINISHED:
+                        return;
                 }
             }
         } catch (IOException e) {

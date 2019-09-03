@@ -68,7 +68,6 @@ public class QuickQuestions implements Initializable {
         countdown.setOnSucceeded(event -> {
             try {
                 String roles = this.communicationService.getRoles(this.numberOfCorrectAnswers);
-                System.out.println(String.format("Roles received: %s", roles));
                 this.stageService.changeToChaseScene(this.answerOne.getScene(), roles);
 
             } catch (IOException e) {
@@ -86,7 +85,6 @@ public class QuickQuestions implements Initializable {
             ++this.numberOfCorrectAnswers;
         }
         ++currentIndex;
-        System.out.println("Question graded");
         this.displayQuestion();
     }
 
@@ -96,8 +94,7 @@ public class QuickQuestions implements Initializable {
 
         this.loadQuestionText(question);
         this.loadQuestionAnswers(question);
-        System.out.println("Question displayed");
-//        this.answerOne.setDisableVisualFocus(true);
+        this.answerOne.setDisableVisualFocus(true);
     }
 
     private void loadQuestionText(Question question) {
@@ -131,14 +128,6 @@ public class QuickQuestions implements Initializable {
 
 //        this.showButtons();
     }
-
-
-//    private void showButtons() {
-//        this.answerOne.setVisible(true);
-//        this.answerTwo.setVisible(true);
-//        this.answerThree.setVisible(true);
-//        this.answerFour.setVisible(true);
-//    }
 
     private void setTestQuestions(){
         this.questions= new Question[100];

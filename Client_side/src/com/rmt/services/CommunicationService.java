@@ -225,5 +225,44 @@ public class CommunicationService {
         }
         return null;
     }
+
+    public Question[] getChaseQuestion() {
+        try {
+            this.sendMessage(GET_CHASE_QUESTIONS, "");
+            return (Question[]) this.serverInput.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean exchangeAnswers(boolean isAnswerCorrect) {
+        try {
+            this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect+"");
+            boolean isOpponentCorrect;
+            Message serverAnswer = (Message) this.serverInput.readObject();
+            if(serverAnswer.getMessageText().equals("true")){
+                isOpponentCorrect = true;
+            }else {
+                isOpponentCorrect = false;
+            }
+            return isOpponentCorrect;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void gameFinished() {
+        try {
+            this.sendMessage(GAME_FINISHED, "");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
 

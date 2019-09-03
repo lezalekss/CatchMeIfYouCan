@@ -19,11 +19,15 @@ public class ClientAppMain extends Application {
 //        primaryStage.setFullScreen(true);
         primaryStage.show();
 
-//        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/theChase.fxml"));
-//
-//        primaryStage.setScene(new Scene(loader.load()));
-//        ((TheChaseController)loader.getController()).setRoles("jeka\nnidza");
-//        primaryStage.show();
+//        showChaseScene(primaryStage);
+    }
+
+    private void showChaseScene(Stage primaryStage) throws java.io.IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/theChase.fxml"));
+
+        primaryStage.setScene(new Scene(loader.load()));
+        ((TheChaseController)loader.getController()).setRoles("jeka#nidza\ntrue#false");
+        primaryStage.show();
     }
 
 

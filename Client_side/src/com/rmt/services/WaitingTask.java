@@ -30,17 +30,12 @@ public class WaitingTask extends Task<String> {
             if(o instanceof Message) {
                 Message msg = (Message)o;
 
-                System.out.println("CW: poruka procitana\n");
-
                 if (msg.getType() == Message.MessageType.PLAY_WITH) {
-
-                    System.out.println("CW vraca username i gasi se");
 
                     return msg.getMessageText();
 
                 } else if (msg.getType() == Message.MessageType.ANSWERS && msg.getMessageText().equals("STOP")) {
 
-                    System.out.println("CW primio stop i gasi se\n");
                     return "shutdown";
                 }
             }else {
