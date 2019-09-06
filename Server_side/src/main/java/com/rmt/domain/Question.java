@@ -6,5 +6,5 @@ import lombok.Data;
 public class Question {
   private String questionText;
   private String[] possibleAnswers;
-  private String correctAnswerIndex;
+  private String correctAnswer;
 }

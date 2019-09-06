@@ -5,8 +5,12 @@
 
 * {
   -fx-primary: #265687;
+  -fx-primary-blured: rgba(38, 86, 135, 0.5);
   -fx-secondary: #d2d7f7;
-  -fx-light-blue: #547e9e;
+  -fx-light-blue: rgb(62, 98, 125);
+  -fx-correct: rgba(66, 145, 39);
+  -fx-wrong: rgba(145, 39, 39);
+  -fx-pressed: rgba(255, 191, 0, 0.9);
 
 }
 
@@ -29,55 +33,41 @@
 }
 
 .button-large{
+    -jfx-button-type: RAISED;
+    -fx-background-color: -fx-primary;
+    -fx-border-color: -fx-primary;
     -fx-padding: 10;
-    -fx-border-color: -fx-secondary;
     -fx-border-radius: 20px;
     -fx-background-radius: 20px;
-    -jfx-button-type: RAISED;
     -fx-font-size: 30px;
     -fx-text-fill: -fx-secondary;
 }
 
-.button-large:hover, .button-large:hover{
-    -fx-border-color: rgb(210,215,247,0.5);
-    -fx-background-color: rgb(210,215,247,0.7);
-    -fx-text-fill: -fx-primary;
-    -fx-stroke: -fx-secondary;
-    -fx-stroke-width: 0.1;
-}
-
-.button-large:hover, .button-large:hover *.text{
-    -fx-stroke: -fx-secondary;
-    -fx-stroke-width: 0.1;
-    -fx-effect: dropshadow( gaussian, rgb(24, 54, 84), 3, 0.1, 1, 1);
-}
-
 .button-medium{
+    -jfx-button-type: RAISED;
+    -fx-background-color: -fx-primary;
+    -fx-border-color: -fx-primary;
     -fx-padding: 10;
-    -fx-border-color: -fx-secondary;
     -fx-border-radius: 20px;
     -fx-background-radius: 20px;
-    -jfx-button-type: RAISED;
     -fx-font-size: 24px;
     -fx-text-fill: -fx-secondary;
 }
 
-.button-medium:hover, .button-medium:hover{
-    -fx-border-color: rgb(210,215,247,0.5);
-    -fx-background-color: rgb(210,215,247,0.7);
-    -fx-text-fill: -fx-primary;
-    -fx-stroke: -fx-secondary;
-    -fx-stroke-width: 0.1;
-}
-
-.button-medium:hover, .button-medium:hover *.text{
-    -fx-stroke: -fx-secondary;
-    -fx-stroke-width: 0.1;
-    -fx-effect: dropshadow( gaussian, rgb(24, 54, 84), 3, 0.1, 1, 1);
+.button-medium:hover, .button-medium:focus, .button-large:hover, .button-large:focus{
+    -fx-border-color: rgb(210,215,247,0.1);
+    -fx-background-color: rgb(210,215,247,0.3);
+    -fx-text-fill: #163452;
 
 }
 
-.jfx-text-field{
+.button-medium:hover *.text, .button-large:hover *.text{
+    -fx-stroke: -fx-secondary;
+    -fx-stroke-width: 0.01;
+    -fx-effect: dropshadow( gaussian, rgb(255, 255, 255), 3, 0.1, 1, 1);
+}
+
+.jfx-text-field, .jfx-password-field{
     -fx-text-fill: -fx-secondary;
     -jfx-focus-color: -fx-primary;
     -jfx-unfocus-color: -fx-secondary;
@@ -85,11 +75,58 @@
     -fx-font-size: 18;
 }
 
+.jfx-text-field:focus *.prompt-text{
+     -fx-stroke: -fx-secondary;
+     -fx-stroke-width: 0.01;
+     -fx-effect: dropshadow( gaussian, rgb(255, 255, 255), 3, 0.1, 1, 1);
+}
 
+.incorrect-info{
+    -jfx-focus-color: -fx-wrong;
+    -jfx-unfocus-color: -fx-wrong;
+}
 
-/*.jfx-list-view{
-     -fx-background-color: transparent;
-     -fx-background-insets: 0,1 ;
+#invalidPassword, #invalidUsername{
+    -fx-text-fill: -fx-wrong;
+    -fx-font-weight: bold;
+    -fx-text-size: 8pt;
+}
+
+#invalidPassword *.text, #invalidUsername *.text{
+     -fx-stroke: -fx-secondary;
+     -fx-stroke-width: 0.01;
+     -fx-effect: dropshadow( gaussian, rgb(196, 159, 159), 0, 0, 0, 0);
+
+}
+
+.jfx-list-view{
+    -fx-background-color: -fx-primary;
+    -fx-border-weight: 0;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+.jfx-list-cell:filled:selected:focused, .jfx-list-cell:filled:selected{
+     -fx-background-color: -fx-primary;
+     -fx-text-fill: -fx-secondary;
+
+}
+
+.jfx-list-cell{
+    -fx-alignment: center;
+    -fx-text-fill: -fx-secondary;
+    -fx-font-size: 20px;
+    -fx-border-weight: 0;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+}
+
+.jfx-list-cell:odd{
+     -fx-background-color: -fx-primary;
+}
+
+.jfx-list-cell:even{
+     -fx-background-color: -fx-primary;
 }
 
 #activePlayersListView .list-cell:empty{
@@ -102,9 +139,7 @@
     -fx-text-alignment: center;
     -fx-font-family: Liberation Sans;
     -fx-font-size: 16;
-}*/
-
-
+}
 
 .chase-step-blue {
     -fx-focus-traversable:false;
@@ -158,8 +193,24 @@
     -fx-font-size: 14pt;
 }
 
+.pressed{
+    -fx-border-color: -fx-pressed;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+}
+
+.correct-answer{
+    -fx-background-color: -fx-correct;
+    -fx-background-radius: 10px;
+}
+
+.wrong-answer{
+    -fx-background-color: -fx-wrong;
+    -fx-background-radius: 10px;
+}
+
 .text-area, .text-area .viewport, .text-area .content {
-    -fx-background-color: transparent ;
+    -fx-background-color: transparent;
     -fx-text-fill: -fx-secondary;
     -fx-font-size: 14pt;
 }

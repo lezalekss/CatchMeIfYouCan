@@ -125,8 +125,6 @@ public class QuickQuestions implements Initializable {
         this.answerTwo.setText(answers[1]);
         this.answerThree.setText(answers[2]);
         this.answerFour.setText(answers[3]);
-
-//        this.showButtons();
     }
 
     private void setTestQuestions(){

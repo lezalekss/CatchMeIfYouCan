@@ -53,7 +53,8 @@ public class TheChaseController implements Initializable {
     @FXML
     ProgressIndicator progressIndicator;
 
-    @FXML Label gameFinishedMessage;
+    @FXML
+    Label gameFinishedMessage;
 
     private static final Integer secondsForAnswering = 10;
     private final IntegerProperty timeSeconds = new SimpleIntegerProperty(secondsForAnswering);
@@ -72,7 +73,6 @@ public class TheChaseController implements Initializable {
     private Question[] questions;
     int i = 0;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.gameFinishedMessage.setOpacity(0);
@@ -90,55 +90,32 @@ public class TheChaseController implements Initializable {
         this.steps.add(eighth);
         this.steps.add(ninth);
 
-        this.question.setOpacity(1);
-        this.timerLabel.setOpacity(1);
-        this.progressIndicator.setOpacity(0);
-
-        this.setTestQuestions();
-
         this.timerLabel.textProperty().bind(this.timeSeconds.asString());
 
+        this.setTestQuestions();
 //        this.questions = this.communicationService.getChaseQuestion();
 
         this.showQuestion(questions[i]);
-
     }
-
 
     public void buttonClicked(ActionEvent event) {
         this.stopTimer();
 
         String chosenAnswer = ((JFXButton) event.getTarget()).getText();
 
-        this.showProgressIndicator();
-
         boolean gameFinished = this.checkAnswer(chosenAnswer);
 
-        this.hideProgressIndicator();
-
-        if(gameFinished == false){
+        if (gameFinished == false) {
             this.showQuestion(questions[++i]);
         }
     }
 
-    private void hideProgressIndicator() {
-        this.progressIndicator.setOpacity(0);
-        this.question.setOpacity(1);
-        this.timerLabel.setOpacity(1);
-    }
-
-    private void showProgressIndicator() {
-        this.question.setOpacity(0);
-        this.timerLabel.setOpacity(0);
-        this.progressIndicator.setOpacity(1);
-    }
-
-    private boolean checkAnswer(String answer) {
-        boolean correct = this.questions[i].getCorrectAnswer().equals(answer);
-        boolean isOpponentCorrect = this.communicationService.exchangeAnswers(correct);
+    private boolean checkAnswer(String chosenAnswer) {
+        boolean isAnswerCorrect = this.questions[i].getCorrectAnswer().equals(chosenAnswer);
+        boolean isOpponentCorrect = this.communicationService.exchangeAnswers(isAnswerCorrect);
 
         if (isThisRunner) {
-            if (correct) {
+            if (isAnswerCorrect) {
                 this.moveRunner();
                 if (runnerPossition == 8) {
                     this.communicationService.gameFinished();
@@ -163,7 +140,7 @@ public class TheChaseController implements Initializable {
                     return true;
                 }
             }
-            if (correct) {
+            if (isAnswerCorrect) {
                 moveChaser();
                 if (runnerPossition == chaserPossition) {
                     this.communicationService.gameFinished();
@@ -175,11 +152,18 @@ public class TheChaseController implements Initializable {
         return false;
     }
 
+//    private void colorAnswer(JFXButton button, boolean isAnswerCorrect){
+//        if(isAnswerCorrect)
+//            button.getStyleClass().add("correct-answer");
+//        else
+//            button.getStyleClass().add("wrong-answer");
+//    }
+
     private void showGameFinishedMessage(String message) {
         Timeline timer = new Timeline();
         KeyFrame countdown = new KeyFrame(Duration.seconds(5));
         timer.getKeyFrames().add(countdown);
-        timer.setOnFinished(e-> {
+        timer.setOnFinished(e -> {
             try {
                 this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
             } catch (IOException e1) {
@@ -228,7 +212,7 @@ public class TheChaseController implements Initializable {
 
     private void timeIsUp() {
         boolean gameFinished = this.checkAnswer("");
-        if(gameFinished == false){
+        if (gameFinished == false) {
             this.showQuestion(questions[++i]);
         }
     }
@@ -274,6 +258,7 @@ public class TheChaseController implements Initializable {
 
         this.answerOne.setDisableVisualFocus(true);
     }
+
 
     public void setRoles(String roles) {
         String[] infos = roles.split("\n");

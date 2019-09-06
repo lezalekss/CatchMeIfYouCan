@@ -32,7 +32,6 @@ public class MatchMakingController implements Initializable {
     JFXButton switchButton;
 
 
-
     private ObservableSet<String> activePlayersSet;
 
     private String username;
@@ -51,7 +50,7 @@ public class MatchMakingController implements Initializable {
 
         Set<String> receivedPlayers = this.communicationService.getActivePlayers();
 
-        if (receivedPlayers.size()>=0) {
+        if (receivedPlayers.size() >= 0) {
 
             //wrap set with observable
             this.activePlayersSet = FXCollections.observableSet(receivedPlayers);
@@ -69,17 +68,22 @@ public class MatchMakingController implements Initializable {
 
     private void addPlayerSelectedListener() {
         this.activePlayersListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete " + newValue.toString() + "?");
+            int selectedIndex = this.activePlayersListView.getSelectionModel().getSelectedIndex();
+            String opponentUsername;
+            if (newValue != null)
+                opponentUsername = newValue.toString();
+            else
+                opponentUsername = oldValue.toString();
+
+            Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete " + opponentUsername + "?");
             Optional<ButtonType> answer = alert.showAndWait();
             if (answer.get() == ButtonType.OK) {
-
-                boolean challengeSuccessful = this.communicationService.challengeOpponent(newValue.toString());
-
+                boolean challengeSuccessful = this.communicationService.challengeOpponent(opponentUsername);
                 if (challengeSuccessful == false) {
                     alert = this.createAlert(Alert.AlertType.ERROR, newValue.toString() + "vise nije aktivan ili je odbio poziv");
                     alert.showAndWait();
                     return;
-                }else{
+                } else {
                     try {
                         this.communicationService.tellServerToStartGame(newValue.toString());
                         this.stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
@@ -93,7 +97,7 @@ public class MatchMakingController implements Initializable {
 
     private void addSetChangedListener() {
         this.activePlayersSet.addListener((SetChangeListener<? super String>) c -> {
-                    //this.activePlayersSet.remove(this.username);
+                    //this.activePlayersSet.remove(this.usernameField);
                     this.activePlayersListView.getItems().clear();
                     this.activePlayersListView.getItems().setAll(this.activePlayersSet);
                 }
@@ -101,7 +105,7 @@ public class MatchMakingController implements Initializable {
     }
 
     public void onSwitchButtonClicked() {
-        if(this.switchButton.getText().equals("SWITCH TO WAITING")){
+        if (this.switchButton.getText().equals("SWITCH TO WAITING")) {
             this.waitForChallenge();
 
             this.communicationService.tellServerToSwitchToWaiting();
@@ -110,7 +114,7 @@ public class MatchMakingController implements Initializable {
 
             this.switchButton.setText("SWITCH TO CHALLENGING");
 
-        }else if(this.switchButton.getText().equals("SWITCH TO CHALLENGING")){
+        } else if (this.switchButton.getText().equals("SWITCH TO CHALLENGING")) {
 
             this.communicationService.tellServerToSwitchToChallenging();
 
@@ -133,9 +137,9 @@ public class MatchMakingController implements Initializable {
         WaitingTask waitingTask = new WaitingTask();
         waitingTask.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                if(newValue.equals("shutdown")){
+                if (newValue.equals("shutdown")) {
                     this.resetButtonsForChallengingState();
-                }else{
+                } else {
                     this.challengerUsername = newValue;
                     this.challengeReceived();
                 }
@@ -207,7 +211,7 @@ public class MatchMakingController implements Initializable {
         this.stageService.changeScene("com/rmt/gui/fxmls/login.fxml", event);
     }
 
-    public void onRefreshButtonClicked(ActionEvent event) {
+    public void onRefreshButtonClicked() {
 //        this.activePlayersListView.setMouseTransparent( true );
 //        this.activePlayersListView.setFocusTraversable( false );
 

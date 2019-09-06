@@ -37,10 +37,11 @@
     <JFXButton fx:id="refreshButton" onAction="#onRefreshButtonClicked" text="REFRESH" styleClass="button-medium"
                GridPane.rowIndex="1" GridPane.columnIndex="0"/>
 
-    <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="button-medium"
+    <JFXButton fx:id="switchButton" onAction="#onSwitchButtonClicked" text="SWITCH TO CHALLENGING" styleClass="button-medium"
                GridPane.rowIndex="2" GridPane.columnIndex="0"/>
 
-    <JFXButton fx:id="switchButton" onAction="#onSwitchButtonClicked" text="SWITCH TO CHALLENGING" styleClass="button-medium"
+    <JFXButton fx:id="logOutButton" onAction="#onLogoutButtonClicked" text="LOG OUT" styleClass="button-medium"
                GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+
 
 </GridPane>

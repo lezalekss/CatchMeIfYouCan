@@ -23,8 +23,6 @@ public class WaitingTask extends Task<String> {
 
     @Override
     protected String call() throws Exception {
-        System.out.println("CW: aktivan \n");
-
         try {
             Object o = (Object)serverInput.readObject();
             if(o instanceof Message) {

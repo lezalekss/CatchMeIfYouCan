@@ -7,29 +7,42 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane gridLinesVisible="false" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" stylesheets="@../resources/test-theme.css" vgap="30.0" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmt.gui.controllers.StartSceneController">
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import javafx.scene.layout.VBox?>
+<GridPane gridLinesVisible="false" alignment="CENTER" prefHeight="400.0" prefWidth="600.0"
+          stylesheets="@../resources/test-theme.css" vgap="30.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+          xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.rmt.gui.controllers.StartSceneController">
     <!--<VBox.margin>-->
     <!--<Insets top="5" right="5" left="5" bottom="5"/>-->
     <!--</VBox.margin>-->
 
     <columnConstraints>
-        <ColumnConstraints halignment="CENTER" percentWidth="60" />
+        <ColumnConstraints halignment="CENTER" percentWidth="60"/>
     </columnConstraints>
 
     <rowConstraints>
-        <RowConstraints percentHeight="30" valignment="CENTER" />
-        <RowConstraints percentHeight="10" valignment="CENTER" />
-        <RowConstraints percentHeight="10" valignment="CENTER" />
+        <RowConstraints percentHeight="30" valignment="CENTER"/>
+
     </rowConstraints>
 
-    <ImageView fitHeight="180" fitWidth="300" pickOnBounds="true" preserveRatio="true" GridPane.columnIndex="0" GridPane.rowIndex="0">
+    <ImageView fx:id="logo" fitHeight="180" fitWidth="300" pickOnBounds="true" preserveRatio="true"
+               GridPane.columnIndex="0" GridPane.rowIndex="0">
         <image>
-            <Image url="@../resources/logo.png" />
+            <Image url="@../resources/logo.png"/>
         </image>
     </ImageView>
 
-    <JFXButton fx:id="connectButton" onAction="#onConnectButtonClicked" styleClass="button-large" text="CONNECT" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-    <JFXButton fx:id="quitButton" onAction="#onQuitButtonClicked" styleClass="button-large" text="QUIT" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+    <VBox fx:id="buttons" alignment="CENTER" spacing="15" GridPane.columnIndex="0" GridPane.rowIndex="1">
+
+        <JFXButton fx:id="rulesButton" onAction="#onRulesButtonClicked" styleClass="button-large" text="RULES"/>
+        <JFXButton fx:id="connectButton" onAction="#onConnectButtonClicked" styleClass="button-large" text="CONNECT"/>
+        <JFXButton fx:id="quitButton" onAction="#onQuitButtonClicked" styleClass="button-large" text="QUIT"/>
+    </VBox>
 
 
+    <VBox fx:id="rules" spacing="30" alignment="center" GridPane.columnIndex="0" GridPane.rowIndex="0"
+          GridPane.rowSpan="2">
+        <JFXTextArea fx:id="rulesText" wrapText="true"/>
+        <JFXButton fx:id="closeRules" onAction="#onCloseRulesButtonClicked" styleClass="button-large" text="CLOSE"/>
+    </VBox>
 </GridPane>
