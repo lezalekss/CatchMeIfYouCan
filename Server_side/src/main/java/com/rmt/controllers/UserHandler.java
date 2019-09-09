@@ -1,11 +1,10 @@
 package com.rmt.controllers;
 
 import com.rmt.DBConnection;
-import com.rmt.ServerAppMain;
+import com.rmt.main.ServerAppMain;
 import com.rmt.domain.GamePair;
 import com.rmt.domain.Message;
 import com.rmt.domain.Player;
-import com.sun.security.ntlm.Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -48,6 +47,7 @@ public class UserHandler extends Thread {
                         this.login(msg);
                         break;
                     case REGISTER:
+                        System.out.println("\nREGISTER ACCEPTED");
                         this.register(msg);
                         break;
                     case GET_ACTIVE: {
@@ -85,7 +85,37 @@ public class UserHandler extends Thread {
                         }
                     }
                     case LOG_OUT: {
-                        this.user.setUsername(null);
+                        System.out.println("Before removing");
+                        System.out.println("\nActive players");
+                        for (String s:ServerAppMain.getActivePlayers()) {
+                            System.out.println(s);
+                        }
+                        System.out.println();
+                        System.out.println("\nOffline players");
+                        for (String s:ServerAppMain.getOfflinePlayers()) {
+                            System.out.println(s);
+                        }
+
+                        if(this.user.getStatus() == Player.PlayerStatus.OFFLINE) {
+                            System.out.println("Status: offline");
+                            ServerAppMain.removePlayerFromOffline(user.getUsername());
+                        } else if(this.user.getStatus() == Player.PlayerStatus.ACTIVE) {
+                            System.out.println("Status: active");
+                            this.sendAnswer("STOP");
+                            ServerAppMain.removePlayerFromActive(user.getUsername());
+                        }
+                        System.out.println("\nActive players");
+                        for (String s:ServerAppMain.getActivePlayers()) {
+                            System.out.println(s);
+                        }
+                        System.out.println();
+                        System.out.println("\nOffline players");
+                        for (String s:ServerAppMain.getOfflinePlayers()) {
+                            System.out.println(s);
+                        }
+
+
+                        this.user.setUsername("");
                         this.user.setStatus(Player.PlayerStatus.OFFLINE);
                         break;
                     }
@@ -175,8 +205,7 @@ public class UserHandler extends Thread {
                         }
                     }
                     case GET_CHASE_QUESTIONS: {
-                        //#TODO
-
+                        this.userOutput.writeObject(this.gamePair.getChaseQuestions());
                         break;
                     }
                     case EXCHANGE_ANSWERS:{
@@ -235,10 +264,10 @@ public class UserHandler extends Thread {
 
 
     private void sendActivePlayers() throws IOException {
-        HashSet<String> players = ServerAppMain.getOnlinePlayers();
+        HashSet<String> players = ServerAppMain.getActivePlayers();
         players.remove(user.getUsername());
         this.userOutput.writeObject(players);
-        //TODO: Add some sleeping maybe
+
         // ServerAppMain.addToActivePlayers(user);
     }
 
@@ -250,7 +279,7 @@ public class UserHandler extends Thread {
         //ServerAppMain.removePlayerFromActive(this.user.getUsername());
 
 
-        HashSet<String> players = ServerAppMain.getOnlinePlayers();
+        HashSet<String> players = ServerAppMain.getActivePlayers();
         players.remove(user.getUsername());
 
         this.userOutput.writeObject(players);

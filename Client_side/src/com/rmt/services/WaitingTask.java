@@ -24,6 +24,7 @@ public class WaitingTask extends Task<String> {
     @Override
     protected String call() throws Exception {
         try {
+            System.out.println("\nCW aktivan, ceka izazov");
             Object o = (Object)serverInput.readObject();
             if(o instanceof Message) {
                 Message msg = (Message)o;
@@ -33,7 +34,7 @@ public class WaitingTask extends Task<String> {
                     return msg.getMessageText();
 
                 } else if (msg.getType() == Message.MessageType.ANSWERS && msg.getMessageText().equals("STOP")) {
-
+                    System.out.println("\nCW se gasi");
                     return "shutdown";
                 }
             }else {

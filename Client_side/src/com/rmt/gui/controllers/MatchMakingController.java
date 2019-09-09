@@ -6,6 +6,7 @@ import com.jfoenix.controls.JFXListView;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
 import com.rmt.services.WaitingTask;
+import javafx.application.Platform;
 import javafx.collections.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -68,28 +69,29 @@ public class MatchMakingController implements Initializable {
 
     private void addPlayerSelectedListener() {
         this.activePlayersListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            int selectedIndex = this.activePlayersListView.getSelectionModel().getSelectedIndex();
             String opponentUsername;
-            if (newValue != null)
+            if (newValue != null) {
                 opponentUsername = newValue.toString();
-            else
-                opponentUsername = oldValue.toString();
-
-            Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete " + opponentUsername + "?");
-            Optional<ButtonType> answer = alert.showAndWait();
-            if (answer.get() == ButtonType.OK) {
-                boolean challengeSuccessful = this.communicationService.challengeOpponent(opponentUsername);
-                if (challengeSuccessful == false) {
-                    alert = this.createAlert(Alert.AlertType.ERROR, newValue.toString() + "vise nije aktivan ili je odbio poziv");
-                    alert.showAndWait();
-                    return;
-                } else {
-                    try {
-                        this.communicationService.tellServerToStartGame(newValue.toString());
-                        this.stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete " + opponentUsername + "?");
+                Optional<ButtonType> answer = alert.showAndWait();
+                if (answer.get() == ButtonType.OK) {
+                    boolean challengeSuccessful = this.communicationService.challengeOpponent(opponentUsername);
+                    if (challengeSuccessful == false) {
+                        alert = this.createAlert(Alert.AlertType.ERROR, newValue.toString() + "vise nije aktivan ili je odbio poziv");
+                        alert.showAndWait();
+//                        ova linija ispod baca neki IndexOutOfBoundsException
+//                        this.onRefreshButtonClicked();
+                        return;
+                    } else {
+                        try {
+                            this.communicationService.tellServerToStartGame(newValue.toString());
+                            this.stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+                } else {
+                    Platform.runLater(() -> this.onRefreshButtonClicked());
                 }
             }
         });
@@ -155,13 +157,7 @@ public class MatchMakingController implements Initializable {
 
     private void challengeReceived() {
 
-//        this.refreshButton.setDisable(true);
-//        this.logOutButton.setDisable(true);
-//        this.activePlayersListView.setDisable(true);
-
-
         boolean accepted = this.showChallengeReceivingDialog(this.challengerUsername);
-
 
         if (accepted) {
             this.communicationService.challengeAccepted(this.challengerUsername);
@@ -172,10 +168,6 @@ public class MatchMakingController implements Initializable {
             }
         } else {
             this.communicationService.challengeRejected(this.challengerUsername);
-
-//            this.refreshButton.setDisable(false);
-//            this.logOutButton.setDisable(false);
-//            this.activePlayersListView.setDisable(false);
 
             this.waitForChallenge();
         }
@@ -207,22 +199,13 @@ public class MatchMakingController implements Initializable {
     }
 
     public void onLogoutButtonClicked(ActionEvent event) throws IOException {
+        System.out.println("Logout clicked");
         this.communicationService.logout();
         this.stageService.changeScene("com/rmt/gui/fxmls/login.fxml", event);
     }
 
     public void onRefreshButtonClicked() {
-//        this.activePlayersListView.setMouseTransparent( true );
-//        this.activePlayersListView.setFocusTraversable( false );
-
-        this.activePlayersListView.setDisable(true);
-
         this.communicationService.updatePlayers(activePlayersSet);
-
-        this.activePlayersListView.setDisable(false);
-
-//        this.activePlayersListView.setMouseTransparent( false );
-//        this.activePlayersListView.setFocusTraversable( true );
     }
 
     public void setUsername(String username) {

@@ -41,7 +41,7 @@ public class QuickQuestions implements Initializable {
     private StageService stageService = StageService.getStageServiceInstance();
 
     private Question[] questions;
-    private int currentIndex = 0;
+    private int currentQuestionIndex = 0;
     private int secondsForAnswering = 15;
 
     private int numberOfCorrectAnswers = 0;
@@ -50,9 +50,9 @@ public class QuickQuestions implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         this.questionText.setFocusTraversable(false);
         this.questionText.setMouseTransparent(true);
-        //ucitaj pitanja
-//        this.questions = communicationService.loadQuickQuestions();
-        this.setTestQuestions();
+
+        this.questions = communicationService.loadQuickQuestions();
+//        this.setTestQuestions();
         this.displayQuestion();
         this.startTimer(secondsForAnswering);
     }
@@ -81,16 +81,21 @@ public class QuickQuestions implements Initializable {
 
     public void answerButtonClicked(ActionEvent event) {
         JFXButton selectedButton = (JFXButton) event.getTarget();
-        if(selectedButton.getText().equals(this.questions[currentIndex].getCorrectAnswer())){
+        if(selectedButton.getText().equals(this.questions[currentQuestionIndex].getCorrectAnswer())){
             ++this.numberOfCorrectAnswers;
         }
-        ++currentIndex;
+        ++currentQuestionIndex;
         this.displayQuestion();
     }
 
 
     private void displayQuestion() {
-        Question question = this.questions[this.currentIndex];
+        if(currentQuestionIndex == this.questions.length){
+            this.questions = this.communicationService.loadQuickQuestions();
+            currentQuestionIndex = 0;
+        }
+
+        Question question = this.questions[this.currentQuestionIndex];
 
         this.loadQuestionText(question);
         this.loadQuestionAnswers(question);
@@ -118,28 +123,30 @@ public class QuickQuestions implements Initializable {
     }
 
     private void loadQuestionAnswers(Question question) {
-        String[] answers = question.getPossibleAnswers();
+        ArrayList<String> answers = new ArrayList<>();
+        answers.addAll(Arrays.asList(question.getPossibleAnswers()));
+        answers.add(question.getCorrectAnswer());
         Collections.shuffle(Arrays.asList(answers));
 
-        this.answerOne.setText(answers[0]);
-        this.answerTwo.setText(answers[1]);
-        this.answerThree.setText(answers[2]);
-        this.answerFour.setText(answers[3]);
+        this.answerOne.setText(answers.get(0));
+        this.answerTwo.setText(answers.get(1));
+        this.answerThree.setText(answers.get(2));
+        this.answerFour.setText(answers.get(3));
     }
 
-    private void setTestQuestions(){
-        this.questions= new Question[100];
-        for (int i=0;i<100;i++) {
-            questions[i] = new Question();
-            questions[i].setQuestionText("pitanje "+i);
-            questions[i].setCorrectAnswer("odg 3");
-            String[] pa = new String[4];
-            pa[0] = "ponudjeni odg 1";
-            pa[1] = "ponudjeni odg 2";
-            pa[2] = "ponudjeni odg 3";
-            pa[3] = "ponudjeni odg 4";
-            questions[i].setPossibleAnswers(pa);
-            questions[i].setCorrectAnswer("ponudjeni odg 1");
-        }
-    }
+//    private void setTestQuestions(){
+//        this.questions= new Question[100];
+//        for (int i=0;i<100;i++) {
+//            questions[i] = new Question();
+//            questions[i].setQuestionText("pitanje "+i);
+//            questions[i].setCorrectAnswer("odg 3");
+//            String[] pa = new String[4];
+//            pa[0] = "ponudjeni odg 1";
+//            pa[1] = "ponudjeni odg 2";
+//            pa[2] = "ponudjeni odg 3";
+//            pa[3] = "ponudjeni odg 4";
+//            questions[i].setPossibleAnswers(pa);
+//            questions[i].setCorrectAnswer("ponudjeni odg 1");
+//        }
+//    }
 }

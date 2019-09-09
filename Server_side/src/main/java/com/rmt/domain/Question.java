@@ -2,9 +2,11 @@ package com.rmt.domain;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class Question {
-  private String questionText;
-  private String[] possibleAnswers;
-  private String correctAnswer;
+public class Question implements Serializable {
+    private String questionText;
+    private String[] possibleAnswers;
+    private String correctAnswer;
 }

@@ -191,6 +191,7 @@
 .answer-button{
     -fx-text-fill: -fx-secondary;
     -fx-font-size: 14pt;
+    -jfx-wrap-text: true;
 }
 
 .pressed{

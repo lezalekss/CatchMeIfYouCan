@@ -1,5 +1,5 @@
 {
-  "Questions": [
+  "QuickQuestions": [
     {
       "possibleAnswers": [
         "Procesor",
@@ -197,177 +197,6 @@
       ],
       "questionText": "Sa kim je Steve Jobs osnovao kompaniju Apple?",
       "correctAnswer": "Steve Wozniak"
-    },
-    {
-      "possibleAnswers": [
-        "Programer kompanije Intel",
-        "Jedan od tvoraca bluetooth tehnologije",
-        "Indijanski poglavica"
-      ],
-      "questionText": "Ko je bio Harald Bluetooth?",
-      "correctAnswer": "Danski kralj u 10. veku"
-    },
-    {
-      "possibleAnswers": [
-        " Mora biti jedinstven za svaku relaciju u bazi",
-        " Povezuje dve relacije",
-        "Ne mora postojati za svaki slog u relaciji"
-      ],
-      "questionText": "Primarni ključ:",
-      "correctAnswer": "Mora biti jedinstven za svaki slog u relaciji"
-    },
-    {
-      "possibleAnswers": [
-        "Sega",
-        "Ubisoft",
-        "Eipix"
-      ],
-      "questionText": "Koja kompanija je kreirala igru Top Eleven Football Manager?",
-      "correctAnswer": "Nordeus"
-    },
-    {
-      "possibleAnswers": [
-        "Paran",
-        "Pozitivan",
-        "Negativan"
-      ],
-      "questionText": "Ako je:\nx mod 2 \u003c\u003e 0, \nonda je ceo broj x: ",
-      "correctAnswer": "Neparan"
-    },
-    {
-      "possibleAnswers": [
-        "\u003ch6\u003e",
-        "\u003chead\u003e",
-        "\u003cheading\u003e"
-      ],
-      "questionText": "HTML element za najveći naslov je:",
-      "correctAnswer": "\u003ch1\u003e"
-    },
-    {
-      "possibleAnswers": [
-        "C",
-        "Java",
-        "J2EE"
-      ],
-      "questionText": "Koji se od ponuđenih programskih jezika koristi za veštacku inteligenciju?",
-      "correctAnswer": "Prolog"
-    },
-    {
-      "possibleAnswers": [
-        "HTTP",
-        "POP3",
-        "SSH"
-      ],
-      "questionText": "Koji se protokol koristi za E-Mail?",
-      "correctAnswer": "SMTP"
-    },
-    {
-      "possibleAnswers": [
-        "Interpreter",
-        "Kompajler",
-        "Komparator"
-      ],
-      "questionText": "Koji kompjuterski program služi za prebacivanje asemblerskog jezika u mašinski jezik?",
-      "correctAnswer": "Asembler"
-    },
-    {
-      "possibleAnswers": [
-        "Virtualnu adresu",
-        "Internet adresu",
-        "Memorijsku adresu"
-      ],
-      "questionText": "Svaki računar povezan na internet ima jedinstvenu:",
-      "correctAnswer": "IP adresu"
-    },
-    {
-      "possibleAnswers": [
-        "Apple",
-        "Microsoft",
-        "Xerox"
-      ],
-      "questionText": "Koja američka kompanija je poznatija pod nazivom Big Blue?",
-      "correctAnswer": "IBM"
-    },
-    {
-      "possibleAnswers": [
-        "Mozila",
-        "Chrome",
-        "Internet Explorer"
-      ],
-      "questionText": "Koji od ponuđenih web browsera je najstariji?",
-      "correctAnswer": "Nexus"
-    },
-    {
-      "possibleAnswers": [
-        "Box",
-        "Tab",
-        "Field"
-      ],
-      "questionText": "Jedno polje u Excel-u se naziva:",
-      "correctAnswer": "Cell"
-    },
-    {
-      "possibleAnswers": [
-        "00001111",
-        "10101010",
-        "01010011"
-      ],
-      "questionText": "Binarna vrednost heksadecimalnog A je?",
-      "correctAnswer": "00001010"
-    },
-    {
-      "possibleAnswers": [
-        "Strong Question Language",
-        "Structured Question Language",
-        "Strong Query Langugage"
-      ],
-      "questionText": "Skraćenica SQL znači:",
-      "correctAnswer": "Structured Query Language"
-    },
-    {
-      "possibleAnswers": [
-        "SELECT Osobe.Ime",
-        "EXTRACT Ime FROM Osobe",
-        "EXTRACT FROM Osobe Ime"
-      ],
-      "questionText": "Kako pomoću SQL-a uzeti kolonu Ime iz tabele Osobe?",
-      "correctAnswer": "SELECT Ime FROM Osobe"
-    },
-    {
-      "possibleAnswers": [
-        "SELECT *.Osobe",
-        "SELECT FROM Osobe",
-        "SELECT all FROM Osobe"
-      ],
-      "questionText": "Kako pomoću SQL-a preuzeti sve kolone iz tabele Osobe?",
-      "correctAnswer": "SELECT * FROM Osobe"
-    },
-    {
-      "possibleAnswers": [
-        "SELECT * FROM Osobe WHERE Ime\u003c\u003e\u0027Petar\u0027",
-        "SELECT [all] FROM Persons WHERE Ime\u003d\u0027Petar\u0027",
-        "SELECT [all] FROM Persons WHERE Ime LIKE \u0027Petar\u0027"
-      ],
-      "questionText": "Kako pomoću SQL-a preuzeti sve podatke čije je Ime jednako Petar, u tabeli Osobe?",
-      "correctAnswer": "SELECT * FROM Osobe WHERE Ime\u003d\u0027Petar\u0027"
-    },
-    {
-      "possibleAnswers": [
-        "SELECT DIFFERENT",
-        "SELECT UNIQUE",
-        "SELECT DIFF"
-      ],
-      "questionText": "Koja SQL naredba uzima isključivo različite vrednosti?\n",
-      "correctAnswer": "SELECT DISTINCT"
-    },
-    {
-      "possibleAnswers": [
-        "INSERT (\u0027Pera\u0027, \u0027Perić\u0027) INTO Osobe",
-        "INSERT VALUES (\u0027Pera\u0027, \u0027Perić\u0027) INTO Osobe",
-        "INSERT Osobe INTO VALUES (\u0027Pera\u0027, \u0027Perić\u0027)"
-      ],
-      "questionText": "Kako pomoću SQL-a ubaciti novi podatak (Pera Perić) u tabelu Osobe?",
-      "correctAnswer": "INSERT INTO Osobe VALUES (\u0027Pera\u0027, \u0027Perić\u0027)"
     },
     {
       "possibleAnswers": [
@@ -598,4 +427,180 @@
       "possibleAnswers": [
         "printf(\"%d\",br);",
         "printf(\"%d\",\u0026br);",
-        "scanf(\"%d\",\u0026br);"
+        "scanf(\"%d\",\u0026br);"]
+    }
+    ],
+  "ChaseQuestions": [
+    {
+      "possibleAnswers": [
+        "Programer kompanije Intel",
+        "Jedan od tvoraca bluetooth tehnologije",
+        "Indijanski poglavica"
+      ],
+      "questionText": "Ko je bio Harald Bluetooth?",
+      "correctAnswer": "Danski kralj u 10. veku"
+    },
+    {
+      "possibleAnswers": [
+        " Mora biti jedinstven za svaku relaciju u bazi",
+        " Povezuje dve relacije",
+        "Ne mora postojati za svaki slog u relaciji"
+      ],
+      "questionText": "Primarni ključ:",
+      "correctAnswer": "Mora biti jedinstven za svaki slog u relaciji"
+    },
+    {
+      "possibleAnswers": [
+        "Sega",
+        "Ubisoft",
+        "Eipix"
+      ],
+      "questionText": "Koja kompanija je kreirala igru Top Eleven Football Manager?",
+      "correctAnswer": "Nordeus"
+    },
+    {
+      "possibleAnswers": [
+        "Paran",
+        "Pozitivan",
+        "Negativan"
+      ],
+      "questionText": "Ako je:\nx mod 2 \u003c\u003e 0, \nonda je ceo broj x: ",
+      "correctAnswer": "Neparan"
+    },
+    {
+      "possibleAnswers": [
+        "\u003ch6\u003e",
+        "\u003chead\u003e",
+        "\u003cheading\u003e"
+      ],
+      "questionText": "HTML element za najveći naslov je:",
+      "correctAnswer": "\u003ch1\u003e"
+    },
+    {
+      "possibleAnswers": [
+        "C",
+        "Java",
+        "J2EE"
+      ],
+      "questionText": "Koji se od ponuđenih programskih jezika koristi za veštacku inteligenciju?",
+      "correctAnswer": "Prolog"
+    },
+    {
+      "possibleAnswers": [
+        "HTTP",
+        "POP3",
+        "SSH"
+      ],
+      "questionText": "Koji se protokol koristi za E-Mail?",
+      "correctAnswer": "SMTP"
+    },
+    {
+      "possibleAnswers": [
+        "Interpreter",
+        "Kompajler",
+        "Komparator"
+      ],
+      "questionText": "Koji kompjuterski program služi za prebacivanje asemblerskog jezika u mašinski jezik?",
+      "correctAnswer": "Asembler"
+    },
+    {
+      "possibleAnswers": [
+        "Virtualnu adresu",
+        "Internet adresu",
+        "Memorijsku adresu"
+      ],
+      "questionText": "Svaki računar povezan na internet ima jedinstvenu:",
+      "correctAnswer": "IP adresu"
+    },
+    {
+      "possibleAnswers": [
+        "Apple",
+        "Microsoft",
+        "Xerox"
+      ],
+      "questionText": "Koja američka kompanija je poznatija pod nazivom Big Blue?",
+      "correctAnswer": "IBM"
+    },
+    {
+      "possibleAnswers": [
+        "Mozila",
+        "Chrome",
+        "Internet Explorer"
+      ],
+      "questionText": "Koji od ponuđenih web browsera je najstariji?",
+      "correctAnswer": "Nexus"
+    },
+    {
+      "possibleAnswers": [
+        "Box",
+        "Tab",
+        "Field"
+      ],
+      "questionText": "Jedno polje u Excel-u se naziva:",
+      "correctAnswer": "Cell"
+    },
+    {
+      "possibleAnswers": [
+        "00001111",
+        "10101010",
+        "01010011"
+      ],
+      "questionText": "Binarna vrednost heksadecimalnog A je?",
+      "correctAnswer": "00001010"
+    },
+    {
+      "possibleAnswers": [
+        "Strong Question Language",
+        "Structured Question Language",
+        "Strong Query Langugage"
+      ],
+      "questionText": "Skraćenica SQL znači:",
+      "correctAnswer": "Structured Query Language"
+    },
+    {
+      "possibleAnswers": [
+        "SELECT Osobe.Ime",
+        "EXTRACT Ime FROM Osobe",
+        "EXTRACT FROM Osobe Ime"
+      ],
+      "questionText": "Kako pomoću SQL-a uzeti kolonu Ime iz tabele Osobe?",
+      "correctAnswer": "SELECT Ime FROM Osobe"
+    },
+    {
+      "possibleAnswers": [
+        "SELECT *.Osobe",
+        "SELECT FROM Osobe",
+        "SELECT all FROM Osobe"
+      ],
+      "questionText": "Kako pomoću SQL-a preuzeti sve kolone iz tabele Osobe?",
+      "correctAnswer": "SELECT * FROM Osobe"
+    },
+    {
+      "possibleAnswers": [
+        "SELECT * FROM Osobe WHERE Ime\u003c\u003e\u0027Petar\u0027",
+        "SELECT [all] FROM Persons WHERE Ime\u003d\u0027Petar\u0027",
+        "SELECT [all] FROM Persons WHERE Ime LIKE \u0027Petar\u0027"
+      ],
+      "questionText": "Kako pomoću SQL-a preuzeti sve podatke čije je Ime jednako Petar, u tabeli Osobe?",
+      "correctAnswer": "SELECT * FROM Osobe WHERE Ime\u003d\u0027Petar\u0027"
+    },
+    {
+      "possibleAnswers": [
+        "SELECT DIFFERENT",
+        "SELECT UNIQUE",
+        "SELECT DIFF"
+      ],
+      "questionText": "Koja SQL naredba uzima isključivo različite vrednosti?\n",
+      "correctAnswer": "SELECT DISTINCT"
+    },
+    {
+      "possibleAnswers": [
+        "INSERT (\u0027Pera\u0027, \u0027Perić\u0027) INTO Osobe",
+        "INSERT VALUES (\u0027Pera\u0027, \u0027Perić\u0027) INTO Osobe",
+        "INSERT Osobe INTO VALUES (\u0027Pera\u0027, \u0027Perić\u0027)"
+      ],
+      "questionText": "Kako pomoću SQL-a ubaciti novi podatak (Pera Perić) u tabelu Osobe?",
+      "correctAnswer": "INSERT INTO Osobe VALUES (\u0027Pera\u0027, \u0027Perić\u0027)"
+    }
+  ]
+}

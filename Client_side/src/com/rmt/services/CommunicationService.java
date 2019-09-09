@@ -178,6 +178,7 @@ public class CommunicationService {
     public void logout() {
         try {
             this.sendMessage(Message.MessageType.LOG_OUT, "");
+            System.out.println("Sent logout message");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -226,7 +227,7 @@ public class CommunicationService {
         return null;
     }
 
-    public Question[] getChaseQuestion() {
+    public Question[] loadChaseQuestions() {
         try {
             this.sendMessage(GET_CHASE_QUESTIONS, "");
             return (Question[]) this.serverInput.readObject();

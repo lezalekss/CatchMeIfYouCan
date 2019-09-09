@@ -40,7 +40,7 @@
             <FontAwesomeIconView glyphName="USER" size="25" />
             <JFXTextField fx:id="usernameField" alignment="CENTER_LEFT" labelFloat="true" onKeyReleased="#handleUsernameField" promptText="Username:" />
         </HBox>
-        <Label fx:id="invalidUsername" alignment="TOP_LEFT" maxWidth="240.0" wrapText="true" />
+        <Label fx:id="invalidUsername" alignment="TOP_LEFT" maxWidth="240.0" prefHeight="16.0" prefWidth="226.0" wrapText="true" />
     </VBox>
 
     <VBox alignment="CENTER_RIGHT" spacing="3" GridPane.columnIndex="0" GridPane.rowIndex="2">

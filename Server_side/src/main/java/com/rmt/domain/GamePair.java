@@ -1,18 +1,22 @@
 package com.rmt.domain;
 
+import com.rmt.QuestionService;
+
 public class GamePair {
+    private QuestionService questionService = QuestionService.getQuestionServiceInstance();
+
     // Klasa koja ce cuvati sve informacije o paru koji je u igri
     private String firstPlayer;
     private String secondPlayer;
-    private Question quickQuestions[]; //simulacija pitanja kasnije ce ovo biti iz json-a popunjeno
     private int firstPlayerCorrectAnswers;
     private int secondPlayerCorrectAnswers;
+    private Question[] quickQuestions;
+    private Question[] chaseQuestions;
     
-    public GamePair(String pairUsernames, Question quickQuestions[]) {
+    public GamePair(String pairUsernames) {
         String users[] = pairUsernames.split("#");
         this.firstPlayer = users[0];
         this.secondPlayer = users[1];
-        this.quickQuestions = quickQuestions;
         this.firstPlayerCorrectAnswers = -1;
         this.secondPlayerCorrectAnswers = -1;
     }
@@ -32,8 +36,17 @@ public class GamePair {
     }
 
     public synchronized Question [] getQuickQuestions(){
+        if(this.quickQuestions == null)
+            this.quickQuestions = this.questionService.getRandomQuestions(QuestionService.Question_Type.QUICK);
         return this.quickQuestions;
     }
+
+    public synchronized Question [] getChaseQuestions(){
+        if(this.chaseQuestions == null)
+            this.chaseQuestions = this.questionService.getRandomQuestions(QuestionService.Question_Type.CHASE);
+        return this.chaseQuestions;
+    }
+
 
     private boolean setFirstPlayerAnswers(int correctAnswers){
         this.firstPlayerCorrectAnswers=correctAnswers;

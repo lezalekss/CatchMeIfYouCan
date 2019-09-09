@@ -71,7 +71,7 @@ public class TheChaseController implements Initializable {
     int runnerPossition = 4;
 
     private Question[] questions;
-    int i = 0;
+    int currentQuestionIndex = -1;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -92,10 +92,10 @@ public class TheChaseController implements Initializable {
 
         this.timerLabel.textProperty().bind(this.timeSeconds.asString());
 
-        this.setTestQuestions();
-//        this.questions = this.communicationService.getChaseQuestion();
+//        this.setTestQuestions();
+        this.questions = this.communicationService.loadChaseQuestions();
 
-        this.showQuestion(questions[i]);
+        this.showQuestion();
     }
 
     public void buttonClicked(ActionEvent event) {
@@ -106,12 +106,12 @@ public class TheChaseController implements Initializable {
         boolean gameFinished = this.checkAnswer(chosenAnswer);
 
         if (gameFinished == false) {
-            this.showQuestion(questions[++i]);
+            this.showQuestion();
         }
     }
 
     private boolean checkAnswer(String chosenAnswer) {
-        boolean isAnswerCorrect = this.questions[i].getCorrectAnswer().equals(chosenAnswer);
+        boolean isAnswerCorrect = this.questions[currentQuestionIndex].getCorrectAnswer().equals(chosenAnswer);
         boolean isOpponentCorrect = this.communicationService.exchangeAnswers(isAnswerCorrect);
 
         if (isThisRunner) {
@@ -161,7 +161,7 @@ public class TheChaseController implements Initializable {
 
     private void showGameFinishedMessage(String message) {
         Timeline timer = new Timeline();
-        KeyFrame countdown = new KeyFrame(Duration.seconds(5));
+        KeyFrame countdown = new KeyFrame(Duration.seconds(3));
         timer.getKeyFrames().add(countdown);
         timer.setOnFinished(e -> {
             try {
@@ -205,7 +205,7 @@ public class TheChaseController implements Initializable {
                 e -> this.timeIsUp(),
                 new KeyValue(this.timeSeconds, 0));
 //        this.timeline.getKeyFrames().addAll(offset, start);
-        this.timeline.getKeyFrames().addAll(start);
+        this.timeline.getKeyFrames().add(start);
         this.timeline.setDelay(Duration.seconds(2));
         this.timeline.playFromStart();
     }
@@ -213,11 +213,17 @@ public class TheChaseController implements Initializable {
     private void timeIsUp() {
         boolean gameFinished = this.checkAnswer("");
         if (gameFinished == false) {
-            this.showQuestion(questions[++i]);
+            this.showQuestion();
         }
     }
 
-    private void showQuestion(Question question) {
+    private void showQuestion() {
+        ++currentQuestionIndex;
+        if(currentQuestionIndex == this.questions.length){
+            this.questions = this.communicationService.loadChaseQuestions();
+            currentQuestionIndex=0;
+        }
+        Question question = this.questions[currentQuestionIndex];
         this.loadQuestionText(question);
         this.loadQuestionAnswers(question);
         this.resetTimer();
@@ -247,8 +253,8 @@ public class TheChaseController implements Initializable {
 
     private void loadQuestionAnswers(Question question) {
         ArrayList<String> possibleAnswers = new ArrayList(3);
-        possibleAnswers.add(question.getPossibleAnswers()[2]);
-        possibleAnswers.add(question.getPossibleAnswers()[3]);
+        possibleAnswers.add(question.getPossibleAnswers()[0]);
+        possibleAnswers.add(question.getPossibleAnswers()[1]);
         possibleAnswers.add(question.getCorrectAnswer());
         Collections.shuffle(possibleAnswers);
 
@@ -279,18 +285,18 @@ public class TheChaseController implements Initializable {
         }
     }
 
-    private void setTestQuestions() {
-        this.questions = new Question[100];
-        for (int i = 0; i < 100; i++) {
-            questions[i] = new Question();
-            questions[i].setQuestionText("Tekst dugog pitanja na koje ne znamo odgovor " + i);
-            String[] pa = new String[4];
-            pa[0] = "odg 1";
-            pa[1] = "odg 2";
-            pa[2] = "odg 3";
-            pa[3] = "odg 4";
-            questions[i].setPossibleAnswers(pa);
-            questions[i].setCorrectAnswer("ponudjeni odg 1");
-        }
-    }
+//    private void setTestQuestions() {
+//        this.questions = new Question[100];
+//        for (int i = 0; i < 100; i++) {
+//            questions[i] = new Question();
+//            questions[i].setQuestionText("Tekst dugog pitanja na koje ne znamo odgovor " + i);
+//            String[] pa = new String[4];
+//            pa[0] = "odg 1";
+//            pa[1] = "odg 2";
+//            pa[2] = "odg 3";
+//            pa[3] = "odg 4";
+//            questions[i].setPossibleAnswers(pa);
+//            questions[i].setCorrectAnswer("ponudjeni odg 1");
+//        }
+//    }
 }

@@ -1,8 +1,7 @@
-package com.rmt;
+package com.rmt.main;
 
 import com.rmt.controllers.GameHandler;
 import com.rmt.controllers.UserHandler;
-import com.rmt.domain.GamePair;
 import com.rmt.domain.Player;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -59,12 +58,22 @@ public class ServerAppMain {
         }
     }
 
-    public static HashSet<String> getOnlinePlayers() {
+    public static HashSet<String> getActivePlayers() {
         //return activePlayersMap.values().stream().collect(Collectors.toList());
         mapLock.readLock().lock();
         try {
             HashSet<String> activePlayersUsernames = new HashSet<>(activePlayersMap.keySet());
             return activePlayersUsernames;
+        } finally {
+            mapLock.readLock().unlock();
+        }
+    }
+
+    public static HashSet<String> getOfflinePlayers() {
+        mapLock.readLock().lock();
+        try {
+            HashSet<String> offlinePlayersUsernames = new HashSet<>(offlinePlayersMap.keySet());
+            return offlinePlayersUsernames;
         } finally {
             mapLock.readLock().unlock();
         }
