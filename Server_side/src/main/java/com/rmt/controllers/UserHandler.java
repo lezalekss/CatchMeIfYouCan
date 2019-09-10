@@ -6,6 +6,7 @@ import com.rmt.domain.GamePair;
 import com.rmt.domain.Message;
 import com.rmt.domain.Player;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -41,13 +42,12 @@ public class UserHandler extends Thread {
 
             while (true) {
                 Message msg = (Message) userInput.readObject();
-                System.out.println("UH u velikom while-u\n");
+//                System.out.println("UH u velikom while-u\n");
                 switch (msg.getType()) {
                     case LOGIN:
                         this.login(msg);
                         break;
                     case REGISTER:
-                        System.out.println("\nREGISTER ACCEPTED");
                         this.register(msg);
                         break;
                     case GET_ACTIVE: {
@@ -152,7 +152,7 @@ public class UserHandler extends Thread {
             } else {
                 ServerAppMain.removePlayerFromOffline(user.getUsername());
             }
-            System.out.println("Player " + user.getUsername() + " just exited");
+            System.out.println("EOF: Player " + user.getUsername() + " just exited");
         } catch (SocketException e) {
             //e.printStackTrace(); // client shuts down
             if (user.getStatus() == Player.PlayerStatus.ACTIVE) {
@@ -160,7 +160,7 @@ public class UserHandler extends Thread {
             } else {
                 ServerAppMain.removePlayerFromOffline(user.getUsername());
             }
-            System.out.println("Player " + user.getUsername() + " just exited");
+            System.out.println("SE: Player " + user.getUsername() + " just exited");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -168,7 +168,7 @@ public class UserHandler extends Thread {
         }
     }
 
-    private void startGame(String usernames, boolean isThisChallenger) throws IOException, ClassNotFoundException {
+    private void startGame(String usernames, boolean isThisChallenger) {
         // startovanje prve igre
         this.gamePair = GameHandler.addPairToMap(usernames);
         System.out.println("UH: Game started and pair created\n");
@@ -182,13 +182,13 @@ public class UserHandler extends Thread {
                     }
                     case SET_CORRECT_ANSWERS: {
                         int correctAnswers = Integer.parseInt(msg.getMessageText()), opponentAnswers;
-                        System.out.println(user.getUsername()+"'s UH received "+correctAnswers+" correct answers");
+//                        System.out.println(user.getUsername()+"'s UH received "+correctAnswers+" correct answers");
 
                         boolean opponentFinished = this.gamePair.setPlayerCorrectAnswers(this.user.getUsername(), correctAnswers);
-                        System.out.println(user.getUsername()+"'s Opponent "+opponentUsername+" finished: "+opponentFinished);
+//                        System.out.println(user.getUsername()+"'s Opponent "+opponentUsername+" finished: "+opponentFinished);
 
                         opponentAnswers = opponentFinished ? this.gamePair.getOpponentsCorrectAnswers(this.user.getUsername()) : waitFewSecondsMore();
-                        System.out.println(user.getUsername()+"'s UH: opponents answers "+opponentAnswers);
+//                        System.out.println(user.getUsername()+"'s UH: opponents answers "+opponentAnswers);
 
                         if(correctAnswers > opponentAnswers){
                             this.sendAnswer(this.user.getUsername()+"#"+this.opponentUsername
@@ -216,6 +216,13 @@ public class UserHandler extends Thread {
                         return;
                 }
             }
+        }catch (EOFException e){
+            ServerAppMain.removePlayerFromOffline(user.getUsername());
+            System.out.println("SG - EOF: Player " + user.getUsername() + " just exited");
+        }catch (SocketException e) {
+            //e.printStackTrace(); // client shuts down
+            ServerAppMain.removePlayerFromOffline(user.getUsername());
+            System.out.println("SG - SE: Player " + user.getUsername() + " just exited");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

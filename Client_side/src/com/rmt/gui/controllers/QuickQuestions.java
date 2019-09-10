@@ -79,6 +79,17 @@ public class QuickQuestions implements Initializable {
     }
 
 
+//    private void startErrorWaiter(){
+//
+//        Task<Void> errorWaiter = new Task<Void>() {
+//            @Override
+//            protected Void call() throws Exception {
+//
+//                return null;
+//            }
+//        };
+//    }
+
     public void answerButtonClicked(ActionEvent event) {
         JFXButton selectedButton = (JFXButton) event.getTarget();
         if(selectedButton.getText().equals(this.questions[currentQuestionIndex].getCorrectAnswer())){

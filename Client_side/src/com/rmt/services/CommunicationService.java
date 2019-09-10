@@ -203,6 +203,8 @@ public class CommunicationService {
     public void startWaitingTask(WaitingTask waitingTask) {
         waitingTask.setServerInput(this.serverInput);
         Thread thread = new Thread(waitingTask);
+//        testiraj kroz debugger
+        thread.setDaemon(true);
         thread.start();
     }
 
