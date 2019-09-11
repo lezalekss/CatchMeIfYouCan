@@ -8,6 +8,7 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
@@ -76,6 +77,7 @@ public class TheChaseController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         this.gameFinishedMessage.setOpacity(0);
+        this.bindAnswerButtons();
 
         this.questionText.setFocusTraversable(false);
         this.questionText.setMouseTransparent(true);
@@ -284,6 +286,15 @@ public class TheChaseController implements Initializable {
             this.isThisChaser = false;
         }
     }
+
+    private void bindAnswerButtons(){
+        this.answerOne.disableProperty().bind(Bindings.or(answerTwo.pressedProperty(), answerThree.pressedProperty()));
+        this.answerTwo.disableProperty().bind(Bindings.or(answerOne.pressedProperty(), answerThree.pressedProperty()));
+        this.answerThree.disableProperty().bind(Bindings.or(answerOne.pressedProperty(), answerTwo.pressedProperty()));
+
+
+    }
+
 
 //    private void setTestQuestions() {
 //        this.questions = new Question[100];

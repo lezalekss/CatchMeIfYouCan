@@ -1,19 +1,26 @@
 package com.rmt.gui.controllers;
 
 import com.jfoenix.controls.JFXButton;
+import com.rmt.domain.Message;
 import com.rmt.domain.Question;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -21,6 +28,9 @@ import java.net.URL;
 import java.util.*;
 
 public class QuickQuestions implements Initializable {
+
+    @FXML
+    private ImageView logo;
 
     @FXML
     private JFXButton answerOne;
@@ -37,6 +47,14 @@ public class QuickQuestions implements Initializable {
     @FXML
     private TextArea questionText;
 
+    @FXML
+    private Label gameFinishedMessage;
+
+    @FXML
+    private VBox gameFinished;
+
+    private StringProperty gameFinishedMessageText = new SimpleStringProperty();
+
     private CommunicationService communicationService = CommunicationService.getCommunicationServiceInstance();
     private StageService stageService = StageService.getStageServiceInstance();
 
@@ -45,9 +63,13 @@ public class QuickQuestions implements Initializable {
     private int secondsForAnswering = 15;
 
     private int numberOfCorrectAnswers = 0;
+    private PauseTransition timer;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        this.gameFinished.setVisible(false);
+        this.gameFinishedMessage.textProperty().bind(gameFinishedMessageText);
         this.questionText.setFocusTraversable(false);
         this.questionText.setMouseTransparent(true);
 
@@ -55,40 +77,65 @@ public class QuickQuestions implements Initializable {
 //        this.setTestQuestions();
         this.displayQuestion();
         this.startTimer(secondsForAnswering);
+        this.startErrorWaiter();
     }
 
     private void startTimer(int seconds){
-        final Task<Void> countdown = new Task<Void>() {
+        this.timer = new PauseTransition(Duration.seconds(seconds));
+        timer.setOnFinished(event -> this.communicationService.sendAnswers(this.numberOfCorrectAnswers));
+        timer.playFromStart();
+    }
+
+    private void startErrorWaiter(){
+        Task<String> errorWaiter = new Task<String>() {
             @Override
-            protected Void call() throws Exception {
-                Thread.sleep(seconds*1000);
+            protected String call() {
+                Message message = communicationService.waitForMessage();
+                if(message.getType() == Message.MessageType.ERROR){
+                    timer.stop();
+                    communicationService.sendAnswers(-1);
+//                    System.out.println(message.getType()+" "+message.getMessageText());
+                    return message.getMessageText();
+                }else if(message.getType() == Message.MessageType.ANSWERS){
+                    System.out.println("Answers received successfuly, error waiter se gasi");
+                    return message.getMessageText();
+                }
                 return null;
             }
         };
-        countdown.setOnSucceeded(event -> {
-            try {
-                String roles = this.communicationService.getRoles(this.numberOfCorrectAnswers);
-                this.stageService.changeToChaseScene(this.answerOne.getScene(), roles);
-
-            } catch (IOException e) {
-                e.printStackTrace();
+        errorWaiter.valueProperty().addListener((observable, oldMessage, newMessage) -> {
+            if(newMessage!=null && !newMessage.contains("#")){
+                this.showGameFinishedMessage(newMessage);
+            }else if (newMessage!=null && newMessage.contains("#")){
+                this.stageService.changeToChaseScene(this.answerOne.getScene(), newMessage);
             }
         });
-        Thread timer = new Thread(countdown);
-        timer.start();
+        Thread waiter = new Thread(errorWaiter);
+        waiter.setDaemon(true);
+        waiter.start();
+    }
+
+    private void showGameFinishedMessage(String message) {
+        this.logo.setOpacity(0.2);
+        this.questionText.setOpacity(0.2);
+        this.answerOne.setOpacity(0.2);
+        this.answerTwo.setOpacity(0.2);
+        this.answerThree.setOpacity(0.2);
+        this.answerFour.setOpacity(0.2);
+        this.gameFinishedMessageText.setValue(message);
+        this.gameFinished.setOpacity(1);
+        this.gameFinished.setVisible(true);
+    }
+
+    public void goBackOnMatchMakingScene(){
+        try {
+            this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
-//    private void startErrorWaiter(){
-//
-//        Task<Void> errorWaiter = new Task<Void>() {
-//            @Override
-//            protected Void call() throws Exception {
-//
-//                return null;
-//            }
-//        };
-//    }
 
     public void answerButtonClicked(ActionEvent event) {
         JFXButton selectedButton = (JFXButton) event.getTarget();

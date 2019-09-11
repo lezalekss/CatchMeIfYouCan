@@ -216,17 +216,12 @@ public class CommunicationService {
         }
     }
 
-    public String getRoles(int numberOfCorrectAnswers) {
+    public void sendAnswers(int numberOfCorrectAnswers) {
         try {
             this.sendMessage(SET_CORRECT_ANSWERS, numberOfCorrectAnswers+"");
-            String roles = ((Message)this.serverInput.readObject()).getMessageText();
-            return roles;
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
-        return null;
     }
 
     public Question[] loadChaseQuestions() {
@@ -266,6 +261,18 @@ public class CommunicationService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Message waitForMessage(){
+        try {
+            Message message = (Message) this.serverInput.readObject();
+            return message;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
 

@@ -42,7 +42,7 @@ public class UserHandler extends Thread {
 
             while (true) {
                 Message msg = (Message) userInput.readObject();
-//                System.out.println("UH u velikom while-u\n");
+                System.out.println("UH u velikom while-u\n");
                 switch (msg.getType()) {
                     case LOGIN:
                         this.login(msg);
@@ -69,7 +69,7 @@ public class UserHandler extends Thread {
 
                         Player challenger = ServerAppMain.findOfflinePlayer(messageText[1]);
                         ObjectOutputStream challengerOutput = challenger.getUserOutput();
-                        challengerOutput.writeObject(new Message(Message.MessageType.ANSWERS, messageText[0]));
+                        sendMessageToOpponent(challengerOutput, Message.MessageType.ANSWERS, messageText[0]);
 
                         if (messageText[0].equals("YES")) {
                             // u start game izazivacev username mora da bude prvi, a ovaj koji je izazvan drugi,
@@ -85,38 +85,7 @@ public class UserHandler extends Thread {
                         }
                     }
                     case LOG_OUT: {
-                        System.out.println("Before removing");
-                        System.out.println("\nActive players");
-                        for (String s:ServerAppMain.getActivePlayers()) {
-                            System.out.println(s);
-                        }
-                        System.out.println();
-                        System.out.println("\nOffline players");
-                        for (String s:ServerAppMain.getOfflinePlayers()) {
-                            System.out.println(s);
-                        }
-
-                        if(this.user.getStatus() == Player.PlayerStatus.OFFLINE) {
-                            System.out.println("Status: offline");
-                            ServerAppMain.removePlayerFromOffline(user.getUsername());
-                        } else if(this.user.getStatus() == Player.PlayerStatus.ACTIVE) {
-                            System.out.println("Status: active");
-                            this.sendAnswer("STOP");
-                            ServerAppMain.removePlayerFromActive(user.getUsername());
-                        }
-                        System.out.println("\nActive players");
-                        for (String s:ServerAppMain.getActivePlayers()) {
-                            System.out.println(s);
-                        }
-                        System.out.println();
-                        System.out.println("\nOffline players");
-                        for (String s:ServerAppMain.getOfflinePlayers()) {
-                            System.out.println(s);
-                        }
-
-
-                        this.user.setUsername("");
-                        this.user.setStatus(Player.PlayerStatus.OFFLINE);
+                        logout();
                         break;
                     }
                     case SWITCH: {
@@ -153,6 +122,7 @@ public class UserHandler extends Thread {
                 ServerAppMain.removePlayerFromOffline(user.getUsername());
             }
             System.out.println("EOF: Player " + user.getUsername() + " just exited");
+            return;
         } catch (SocketException e) {
             //e.printStackTrace(); // client shuts down
             if (user.getStatus() == Player.PlayerStatus.ACTIVE) {
@@ -161,11 +131,23 @@ public class UserHandler extends Thread {
                 ServerAppMain.removePlayerFromOffline(user.getUsername());
             }
             System.out.println("SE: Player " + user.getUsername() + " just exited");
+            return;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void logout() throws IOException {
+        if(this.user.getStatus() == Player.PlayerStatus.OFFLINE) {
+            ServerAppMain.removePlayerFromOffline(user.getUsername());
+        } else if(this.user.getStatus() == Player.PlayerStatus.ACTIVE) {
+            this.sendAnswer("STOP");
+            ServerAppMain.removePlayerFromActive(user.getUsername());
+        }
+        this.user.setUsername("");
+        this.user.setStatus(Player.PlayerStatus.OFFLINE);
     }
 
     private void startGame(String usernames, boolean isThisChallenger) {
@@ -182,6 +164,9 @@ public class UserHandler extends Thread {
                     }
                     case SET_CORRECT_ANSWERS: {
                         int correctAnswers = Integer.parseInt(msg.getMessageText()), opponentAnswers;
+                        if(correctAnswers == -1){
+                            return;
+                        }
 //                        System.out.println(user.getUsername()+"'s UH received "+correctAnswers+" correct answers");
 
                         boolean opponentFinished = this.gamePair.setPlayerCorrectAnswers(this.user.getUsername(), correctAnswers);
@@ -218,10 +203,12 @@ public class UserHandler extends Thread {
             }
         }catch (EOFException e){
             ServerAppMain.removePlayerFromOffline(user.getUsername());
+            sendMessageToOpponent(this.opponentOutputStream, Message.MessageType.ERROR, this.user.getUsername() + " left the game. You won!");
             System.out.println("SG - EOF: Player " + user.getUsername() + " just exited");
         }catch (SocketException e) {
             //e.printStackTrace(); // client shuts down
             ServerAppMain.removePlayerFromOffline(user.getUsername());
+            sendMessageToOpponent(this.opponentOutputStream, Message.MessageType.ERROR, this.user.getUsername() + " left the game. You won!");
             System.out.println("SG - SE: Player " + user.getUsername() + " just exited");
         } catch (IOException e) {
             e.printStackTrace();
@@ -231,6 +218,7 @@ public class UserHandler extends Thread {
             // NISU UPISANI ODGOVORI DRUGOG IGRACA (VEROVATNO JE IZASAO)
         }
     }
+
     private int waitFewSecondsMore() throws TimeoutException {
         try {
             this.sleep(300);
@@ -263,7 +251,7 @@ public class UserHandler extends Thread {
 
 //        System.out.println("UH: naso za izazvanog strimove");
 
-        opponentOutput.writeObject(new Message(Message.MessageType.PLAY_WITH, user.getUsername()));
+        sendMessageToOpponent(opponentOutput, Message.MessageType.PLAY_WITH, user.getUsername());
         opponentOutput.flush();
 
 //        System.out.println("UH poslo izvanom pw\n");
@@ -339,4 +327,11 @@ public class UserHandler extends Thread {
         this.userOutput.writeObject(message);
     }
 
+    private void sendMessageToOpponent(ObjectOutputStream opponentOutputStream, Message.MessageType messageType, String messageText) {
+        try {
+            opponentOutputStream.writeObject(new Message(messageType, messageText));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

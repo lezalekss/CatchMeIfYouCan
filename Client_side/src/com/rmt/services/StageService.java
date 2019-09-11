@@ -40,6 +40,7 @@ public class StageService {
         currentStage.setFullScreenExitHint("");
         currentStage.setFullScreen(fullscreen);
 //        currentStage.show();
+
     }
 
 
@@ -56,10 +57,14 @@ public class StageService {
         ((MatchMakingController)loader.getController()).setUsername(username);
     }
 
-    public void changeToChaseScene(Scene scene, String roles) throws IOException {
+    public void changeToChaseScene(Scene scene, String roles) {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/theChase.fxml"));
         Stage currentStage = (Stage) scene.getWindow();
-        currentStage.getScene().setRoot(loader.load());
+        try {
+            currentStage.getScene().setRoot(loader.load());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ((TheChaseController)loader.getController()).setRoles(roles);
 
 
