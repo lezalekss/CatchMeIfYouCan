@@ -236,23 +236,39 @@ public class CommunicationService {
         return null;
     }
 
-    public boolean exchangeAnswers(boolean isAnswerCorrect) {
+//    public boolean sendChaseAnswer(boolean isAnswerCorrect) {
+//        try {
+//            this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect+"");
+//            boolean isOpponentCorrect;
+//            Message serverAnswer = (Message) this.serverInput.readObject();
+//            if(serverAnswer.getMessageText().equals("true")){
+//                isOpponentCorrect = true;
+//            }else {
+//                isOpponentCorrect = false;
+//            }
+//            return isOpponentCorrect;
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+//    }
+
+    public void sendChaseAnswer(boolean isAnswerCorrect) {
         try {
             this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect+"");
-            boolean isOpponentCorrect;
-            Message serverAnswer = (Message) this.serverInput.readObject();
-            if(serverAnswer.getMessageText().equals("true")){
-                isOpponentCorrect = true;
-            }else {
-                isOpponentCorrect = false;
-            }
-            return isOpponentCorrect;
+//            boolean isOpponentCorrect;
+//            Message serverAnswer = (Message) this.serverInput.readObject();
+//            if(serverAnswer.getMessageText().equals("true")){
+//                isOpponentCorrect = true;
+//            }else {
+//                isOpponentCorrect = false;
+//            }
+//            return isOpponentCorrect;
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
         }
-        return false;
     }
 
     public void gameFinished() {

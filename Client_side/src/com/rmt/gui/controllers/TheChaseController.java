@@ -1,6 +1,7 @@
 package com.rmt.gui.controllers;
 
 import com.jfoenix.controls.JFXButton;
+import com.rmt.domain.Message;
 import com.rmt.domain.Question;
 import com.rmt.services.CommunicationService;
 import com.rmt.services.StageService;
@@ -11,6 +12,9 @@ import javafx.animation.Timeline;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -55,7 +59,12 @@ public class TheChaseController implements Initializable {
     ProgressIndicator progressIndicator;
 
     @FXML
-    Label gameFinishedMessage;
+    private Label gameFinishedMessage;
+
+    @FXML
+    private VBox gameFinished;
+
+    private StringProperty gameFinishedMessageText = new SimpleStringProperty();
 
     private static final Integer secondsForAnswering = 10;
     private final IntegerProperty timeSeconds = new SimpleIntegerProperty(secondsForAnswering);
@@ -74,10 +83,14 @@ public class TheChaseController implements Initializable {
     private Question[] questions;
     int currentQuestionIndex = -1;
 
+    boolean isAnswerCorrect;
+    boolean isOpponentCorrect;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        this.gameFinishedMessage.setOpacity(0);
+        this.gameFinished.setVisible(false);
         this.bindAnswerButtons();
+        this.gameFinishedMessage.textProperty().bind(this.gameFinishedMessageText);
 
         this.questionText.setFocusTraversable(false);
         this.questionText.setMouseTransparent(true);
@@ -96,62 +109,99 @@ public class TheChaseController implements Initializable {
 
 //        this.setTestQuestions();
         this.questions = this.communicationService.loadChaseQuestions();
-
         this.showQuestion();
     }
 
     public void buttonClicked(ActionEvent event) {
         this.stopTimer();
+        JFXButton selectedButton = (JFXButton) event.getSource();
 
-        String chosenAnswer = ((JFXButton) event.getTarget()).getText();
+        String chosenAnswer = selectedButton.getText();
 
-        boolean gameFinished = this.checkAnswer(chosenAnswer);
+        this.questionText.setVisible(false);
+        this.showAnswerButtons(false);
+        this.progressIndicator.setVisible(true);
 
-        if (gameFinished == false) {
-            this.showQuestion();
-        }
+        this.isAnswerCorrect = this.questions[currentQuestionIndex].getCorrectAnswer().equals(chosenAnswer);
+        this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
+        this.startErrorWaiter();
+
+//        boolean gameFinished = this.checkAnswers(chosenAnswer);
+//
+//        if (gameFinished == false) {
+//            this.showQuestion();
+//        }
     }
 
-    private boolean checkAnswer(String chosenAnswer) {
-        boolean isAnswerCorrect = this.questions[currentQuestionIndex].getCorrectAnswer().equals(chosenAnswer);
-        boolean isOpponentCorrect = this.communicationService.exchangeAnswers(isAnswerCorrect);
+    private void startErrorWaiter(){
+        Task<Message> errorWaiter = new Task<Message>() {
+            @Override
+            protected Message call() {
+                Message message = communicationService.waitForMessage();
+                System.out.println(message);
+                return message;
+            }
+        };
+        errorWaiter.valueProperty().addListener((observable, oldMessage, newMessage) -> {
+            if(newMessage!=null && newMessage.getType() == Message.MessageType.ERROR){
+                timeline.stop(); //ne poziva onFinished, jeeej
+//                this.communicationService.gameFinished();
+                this.showGameFinishedMessage(newMessage.getMessageText());
+            }else if(newMessage!=null && newMessage.getType() == Message.MessageType.EXCHANGE_ANSWERS){
+//                this.startErrorWaiter();
+                if(newMessage.getMessageText().equals("true")){
+                    this.isOpponentCorrect = true;
+                }else{
+                    this.isOpponentCorrect=false;
+                }
+                this.checkAnswers();
+            }
+        });
+        Thread waiter = new Thread(errorWaiter);
+        waiter.setDaemon(true);
+        waiter.start();
+    }
 
+    private void checkAnswers() {
+        boolean showNextQuestion = true;
         if (isThisRunner) {
-            if (isAnswerCorrect) {
+            if (this.isAnswerCorrect) {
                 this.moveRunner();
                 if (runnerPossition == 8) {
                     this.communicationService.gameFinished();
                     this.showGameFinishedMessage("Congratulations! You escaped!");
-                    return true;
+                    showNextQuestion = false;
                 }
             }
-            if (isOpponentCorrect) {
+            if (this.isOpponentCorrect) {
                 moveChaser();
                 if (runnerPossition == chaserPossition) {
                     this.communicationService.gameFinished();
                     this.showGameFinishedMessage("Sorry, the chaser got you.");
-                    return true;
+                    showNextQuestion = false;
                 }
             }
         } else if (isThisChaser) {
-            if (isOpponentCorrect) {
+            if (this.isOpponentCorrect) {
                 this.moveRunner();
                 if (runnerPossition == 8) {
                     this.communicationService.gameFinished();
                     this.showGameFinishedMessage("Sorry, the runner escaped.");
-                    return true;
+                    showNextQuestion = false;
                 }
             }
-            if (isAnswerCorrect) {
+            if (this.isAnswerCorrect) {
                 moveChaser();
                 if (runnerPossition == chaserPossition) {
                     this.communicationService.gameFinished();
                     this.showGameFinishedMessage("Congratulations! You caught the runner!");
-                    return true;
+                    showNextQuestion = false;
                 }
             }
         }
-        return false;
+        if(showNextQuestion){
+            this.showQuestion();
+        }
     }
 
 //    private void colorAnswer(JFXButton button, boolean isAnswerCorrect){
@@ -162,22 +212,23 @@ public class TheChaseController implements Initializable {
 //    }
 
     private void showGameFinishedMessage(String message) {
-        Timeline timer = new Timeline();
-        KeyFrame countdown = new KeyFrame(Duration.seconds(3));
-        timer.getKeyFrames().add(countdown);
-        timer.setOnFinished(e -> {
-            try {
-                this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        });
         this.step.setOpacity(0.2);
         this.question.setOpacity(0.2);
         this.timerLabel.setOpacity(0.2);
-        this.gameFinishedMessage.setText(message);
-        this.gameFinishedMessage.setOpacity(1);
-        timer.playFromStart();
+        this.progressIndicator.setVisible(false);
+        this.gameFinishedMessageText.setValue(message);
+        this.gameFinished.setOpacity(1);
+        this.gameFinished.setVisible(true);
+    }
+
+    public void goBackOnMatchMakingScene(){
+        try {
+//            Message m = this.communicationService.waitForMessage();
+//            System.out.println("\n\n\n"+m);
+            this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void moveRunner() {
@@ -213,10 +264,13 @@ public class TheChaseController implements Initializable {
     }
 
     private void timeIsUp() {
-        boolean gameFinished = this.checkAnswer("");
-        if (gameFinished == false) {
-            this.showQuestion();
-        }
+        this.isAnswerCorrect = false;
+        this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
+        this.startErrorWaiter();
+//        boolean gameFinished = this.checkAnswers();
+//        if (gameFinished == false) {
+//            this.showQuestion();
+//        }
     }
 
     private void showQuestion() {
@@ -232,6 +286,7 @@ public class TheChaseController implements Initializable {
     }
 
     private void loadQuestionText(Question question) {
+        this.questionText.setVisible(true);
         String questionText = question.getQuestionText();
 
         final IntegerProperty i = new SimpleIntegerProperty(0);
@@ -254,6 +309,8 @@ public class TheChaseController implements Initializable {
     }
 
     private void loadQuestionAnswers(Question question) {
+        this.progressIndicator.setVisible(false);
+        showAnswerButtons(true);
         ArrayList<String> possibleAnswers = new ArrayList(3);
         possibleAnswers.add(question.getPossibleAnswers()[0]);
         possibleAnswers.add(question.getPossibleAnswers()[1]);
@@ -265,6 +322,13 @@ public class TheChaseController implements Initializable {
         this.answerThree.setText(possibleAnswers.get(2));
 
         this.answerOne.setDisableVisualFocus(true);
+
+    }
+
+    private void showAnswerButtons(boolean show) {
+        this.answerOne.setVisible(show);
+        this.answerTwo.setVisible(show);
+        this.answerThree.setVisible(show);
     }
 
 

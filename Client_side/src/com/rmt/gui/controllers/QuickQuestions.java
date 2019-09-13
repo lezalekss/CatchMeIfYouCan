@@ -97,7 +97,7 @@ public class QuickQuestions implements Initializable {
 //                    System.out.println(message.getType()+" "+message.getMessageText());
                     return message.getMessageText();
                 }else if(message.getType() == Message.MessageType.ANSWERS){
-                    System.out.println("Answers received successfuly, error waiter se gasi");
+//                    System.out.println("Answers received successfuly, error waiter se gasi");
                     return message.getMessageText();
                 }
                 return null;

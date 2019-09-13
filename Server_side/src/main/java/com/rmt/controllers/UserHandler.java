@@ -42,7 +42,7 @@ public class UserHandler extends Thread {
 
             while (true) {
                 Message msg = (Message) userInput.readObject();
-                System.out.println("UH u velikom while-u\n");
+                System.out.println(user.getUsername()+" UH u velikom while-u "+msg);
                 switch (msg.getType()) {
                     case LOGIN:
                         this.login(msg);
@@ -109,6 +109,9 @@ public class UserHandler extends Thread {
                         this.startGame(String.format("%s#%s", user.getUsername(), this.opponentUsername), true);
                         break;
                     }
+                    //ovaj slucaj se desi ako neki takmicar prvo odgovori na pitanje pa izadje iz app
+                    case EXCHANGE_ANSWERS:
+                        break;
                     default:
                         this.sendError("Unexpected error");
                         break;
@@ -194,6 +197,7 @@ public class UserHandler extends Thread {
                         break;
                     }
                     case EXCHANGE_ANSWERS:{
+                        System.out.println(user.getUsername()+" Exchange answers received "+ msg);
                         this.opponentOutputStream.writeObject(msg);
                         break;
                     }
@@ -205,11 +209,12 @@ public class UserHandler extends Thread {
             ServerAppMain.removePlayerFromOffline(user.getUsername());
             sendMessageToOpponent(this.opponentOutputStream, Message.MessageType.ERROR, this.user.getUsername() + " left the game. You won!");
             System.out.println("SG - EOF: Player " + user.getUsername() + " just exited");
+            return;
         }catch (SocketException e) {
             //e.printStackTrace(); // client shuts down
             ServerAppMain.removePlayerFromOffline(user.getUsername());
-            sendMessageToOpponent(this.opponentOutputStream, Message.MessageType.ERROR, this.user.getUsername() + " left the game. You won!");
-            System.out.println("SG - SE: Player " + user.getUsername() + " just exited");
+//            sendMessageToOpponent(this.opponentOutputStream, Message.MessageType.ERROR, this.user.getUsername() + " left the game. You won!");
+            System.out.println("SG - SE: Player " + user.getUsername());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

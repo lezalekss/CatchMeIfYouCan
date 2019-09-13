@@ -45,14 +45,17 @@
 
     <Label fx:id="timerLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-    <!--<ProgressIndicator fx:id="progressIndicator" mouseTransparent="true" visible="false" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1">-->
-        <!--<GridPane.margin>-->
-            <!--<Insets bottom="20.0" top="20.0" />-->
-        <!--</GridPane.margin>-->
-    <!--</ProgressIndicator>-->
+    <ProgressIndicator fx:id="progressIndicator" mouseTransparent="true" visible="false" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1">
+        <GridPane.margin>
+            <Insets bottom="20.0" top="20.0" />
+        </GridPane.margin>
+    </ProgressIndicator>
 
+    <VBox fx:id="gameFinished" alignment="CENTER" spacing="20" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0" GridPane.rowSpan="2">
+        <Label fx:id="gameFinishedMessage" alignment="center" wrapText="true"/>
+        <JFXButton fx:id="close" onAction="#goBackOnMatchMakingScene" styleClass="button-large" text="OK"/>
+    </VBox>
 
-    <Label fx:id="gameFinishedMessage" alignment="center" wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="0" GridPane.rowSpan="2" />
 
     <columnConstraints>
         <ColumnConstraints halignment="CENTER" />
