@@ -42,7 +42,7 @@ public class UserHandler extends Thread {
 
             while (true) {
                 Message msg = (Message) userInput.readObject();
-                System.out.println(user.getUsername()+" UH u velikom while-u "+msg);
+                System.out.println(user.getUsername() + " UH u velikom while-u " + msg);
                 switch (msg.getType()) {
                     case LOGIN:
                         this.login(msg);
@@ -103,6 +103,7 @@ public class UserHandler extends Thread {
                         }
                     }
                     case GAME_ACCEPTED: {
+                        System.out.println(user.getUsername() + "' UH is in game accepted case " + msg);
                         //starts method for game managing for challenger, message text is challenged username
                         this.opponentUsername = msg.getMessageText();
                         this.opponentOutputStream = ServerAppMain.findOfflinePlayer(opponentUsername).getUserOutput();
@@ -143,9 +144,9 @@ public class UserHandler extends Thread {
     }
 
     private void logout() throws IOException {
-        if(this.user.getStatus() == Player.PlayerStatus.OFFLINE) {
+        if (this.user.getStatus() == Player.PlayerStatus.OFFLINE) {
             ServerAppMain.removePlayerFromOffline(user.getUsername());
-        } else if(this.user.getStatus() == Player.PlayerStatus.ACTIVE) {
+        } else if (this.user.getStatus() == Player.PlayerStatus.ACTIVE) {
             this.sendAnswer("STOP");
             ServerAppMain.removePlayerFromActive(user.getUsername());
         }
@@ -167,7 +168,7 @@ public class UserHandler extends Thread {
                     }
                     case SET_CORRECT_ANSWERS: {
                         int correctAnswers = Integer.parseInt(msg.getMessageText()), opponentAnswers;
-                        if(correctAnswers == -1){
+                        if (correctAnswers == -1) {
                             return;
                         }
 //                        System.out.println(user.getUsername()+"'s UH received "+correctAnswers+" correct answers");
@@ -178,17 +179,17 @@ public class UserHandler extends Thread {
                         opponentAnswers = opponentFinished ? this.gamePair.getOpponentsCorrectAnswers(this.user.getUsername()) : waitFewSecondsMore();
 //                        System.out.println(user.getUsername()+"'s UH: opponents answers "+opponentAnswers);
 
-                        if(correctAnswers > opponentAnswers){
-                            this.sendAnswer(this.user.getUsername()+"#"+this.opponentUsername
-                                            +"\n"+true+"#"+"false");
+                        if (correctAnswers > opponentAnswers) {
+                            this.sendAnswer(this.user.getUsername() + "#" + this.opponentUsername
+                                    + "\n" + true + "#" + "false");
                             break;
-                        }else if(opponentAnswers > correctAnswers){
-                            this.sendAnswer(this.opponentUsername+"#"+this.user.getUsername()
-                                            +"\n"+false+"#"+true);
+                        } else if (opponentAnswers > correctAnswers) {
+                            this.sendAnswer(this.opponentUsername + "#" + this.user.getUsername()
+                                    + "\n" + false + "#" + true);
                             break;
-                        }else{
+                        } else {
                             //ako imaju jednako poena, challenger je chaser
-                            this.sendAnswer(usernames+"\n"+isThisChallenger+"#"+!isThisChallenger);
+                            this.sendAnswer(usernames + "\n" + isThisChallenger + "#" + !isThisChallenger);
                             break;
                         }
                     }
@@ -196,21 +197,23 @@ public class UserHandler extends Thread {
                         this.userOutput.writeObject(this.gamePair.getChaseQuestions());
                         break;
                     }
-                    case EXCHANGE_ANSWERS:{
-                        System.out.println(user.getUsername()+" Exchange answers received "+ msg);
+                    case EXCHANGE_ANSWERS: {
+                        System.out.println(user.getUsername() + " Exchange answers received " + msg);
                         this.opponentOutputStream.writeObject(msg);
                         break;
                     }
                     case GAME_FINISHED:
                         return;
+                    default:
+                        System.out.println(msg);
                 }
             }
-        }catch (EOFException e){
+        } catch (EOFException e) {
             ServerAppMain.removePlayerFromOffline(user.getUsername());
             sendMessageToOpponent(this.opponentOutputStream, Message.MessageType.ERROR, this.user.getUsername() + " left the game. You won!");
             System.out.println("SG - EOF: Player " + user.getUsername() + " just exited");
             return;
-        }catch (SocketException e) {
+        } catch (SocketException e) {
             //e.printStackTrace(); // client shuts down
             ServerAppMain.removePlayerFromOffline(user.getUsername());
 //            sendMessageToOpponent(this.opponentOutputStream, Message.MessageType.ERROR, this.user.getUsername() + " left the game. You won!");

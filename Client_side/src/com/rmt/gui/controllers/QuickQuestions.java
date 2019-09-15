@@ -80,23 +80,23 @@ public class QuickQuestions implements Initializable {
         this.startErrorWaiter();
     }
 
-    private void startTimer(int seconds){
+    private void startTimer(int seconds) {
         this.timer = new PauseTransition(Duration.seconds(seconds));
         timer.setOnFinished(event -> this.communicationService.sendAnswers(this.numberOfCorrectAnswers));
         timer.playFromStart();
     }
 
-    private void startErrorWaiter(){
+    private void startErrorWaiter() {
         Task<String> errorWaiter = new Task<String>() {
             @Override
             protected String call() {
                 Message message = communicationService.waitForMessage();
-                if(message.getType() == Message.MessageType.ERROR){
+                if (message.getType() == Message.MessageType.ERROR) {
                     timer.stop();
                     communicationService.sendAnswers(-1);
 //                    System.out.println(message.getType()+" "+message.getMessageText());
                     return message.getMessageText();
-                }else if(message.getType() == Message.MessageType.ANSWERS){
+                } else if (message.getType() == Message.MessageType.ANSWERS) {
 //                    System.out.println("Answers received successfuly, error waiter se gasi");
                     return message.getMessageText();
                 }
@@ -104,9 +104,9 @@ public class QuickQuestions implements Initializable {
             }
         };
         errorWaiter.valueProperty().addListener((observable, oldMessage, newMessage) -> {
-            if(newMessage!=null && !newMessage.contains("#")){
+            if (newMessage != null && !newMessage.contains("#")) {
                 this.showGameFinishedMessage(newMessage);
-            }else if (newMessage!=null && newMessage.contains("#")){
+            } else if (newMessage != null && newMessage.contains("#")) {
                 this.stageService.changeToChaseScene(this.answerOne.getScene(), newMessage);
             }
         });
@@ -127,19 +127,14 @@ public class QuickQuestions implements Initializable {
         this.gameFinished.setVisible(true);
     }
 
-    public void goBackOnMatchMakingScene(){
-        try {
-            this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void goBackOnMatchMakingScene() {
+        this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
     }
-
 
 
     public void answerButtonClicked(ActionEvent event) {
         JFXButton selectedButton = (JFXButton) event.getTarget();
-        if(selectedButton.getText().equals(this.questions[currentQuestionIndex].getCorrectAnswer())){
+        if (selectedButton.getText().equals(this.questions[currentQuestionIndex].getCorrectAnswer())) {
             ++this.numberOfCorrectAnswers;
         }
         ++currentQuestionIndex;
@@ -148,7 +143,7 @@ public class QuickQuestions implements Initializable {
 
 
     private void displayQuestion() {
-        if(currentQuestionIndex == this.questions.length){
+        if (currentQuestionIndex == this.questions.length) {
             this.questions = this.communicationService.loadQuickQuestions();
             currentQuestionIndex = 0;
         }

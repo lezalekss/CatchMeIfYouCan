@@ -83,12 +83,8 @@ public class MatchMakingController implements Initializable {
 //                        this.onRefreshButtonClicked();
                         return;
                     } else {
-                        try {
-                            this.communicationService.tellServerToStartGame(newValue.toString());
                             this.stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+
                     }
                 } else {
                     Platform.runLater(() -> this.onRefreshButtonClicked());
@@ -161,11 +157,7 @@ public class MatchMakingController implements Initializable {
 
         if (accepted) {
             this.communicationService.challengeAccepted(this.challengerUsername);
-            try {
                 stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         } else {
             this.communicationService.challengeRejected(this.challengerUsername);
 

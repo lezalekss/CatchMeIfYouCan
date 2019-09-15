@@ -31,15 +31,19 @@ public class StageService {
         currentScene.show();
     }
 
-    public void changeScene(String newScene, Scene scene, boolean fullscreen) throws IOException {
-        Parent parent = FXMLLoader.load(getClass().getClassLoader().getResource(newScene));
-
-        Stage currentStage = (Stage) scene.getWindow();
-        currentStage.getScene().setRoot(parent);
+    public void changeScene(String newScene, Scene scene, boolean fullscreen) {
+        try {
+            Parent parent = FXMLLoader.load(getClass().getClassLoader().getResource(newScene));
+            Stage currentStage = (Stage) scene.getWindow();
+            currentStage.getScene().setRoot(parent);
 //        currentStage.hide();
-        currentStage.setFullScreenExitHint("");
-        currentStage.setFullScreen(fullscreen);
+            currentStage.setFullScreenExitHint("");
+            currentStage.setFullScreen(fullscreen);
 //        currentStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -50,7 +54,7 @@ public class StageService {
         currentScene.close();
     }
 
-    public void changeToActivePlayersScene(ActionEvent event, String username) throws IOException {
+    public void changeToMatchmakingScene(ActionEvent event, String username) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("com/rmt/gui/fxmls/matchMakingScene.fxml"));
         Stage currentStage = (Stage) ((Node)event.getSource()).getScene().getWindow();
         currentStage.getScene().setRoot(loader.load());

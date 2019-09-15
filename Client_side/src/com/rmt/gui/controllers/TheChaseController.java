@@ -124,7 +124,7 @@ public class TheChaseController implements Initializable {
 
         this.isAnswerCorrect = this.questions[currentQuestionIndex].getCorrectAnswer().equals(chosenAnswer);
         this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
-        this.startErrorWaiter();
+        this.startMessageWaiter();
 
 //        boolean gameFinished = this.checkAnswers(chosenAnswer);
 //
@@ -133,7 +133,7 @@ public class TheChaseController implements Initializable {
 //        }
     }
 
-    private void startErrorWaiter(){
+    private void startMessageWaiter() {
         Task<Message> errorWaiter = new Task<Message>() {
             @Override
             protected Message call() {
@@ -143,16 +143,16 @@ public class TheChaseController implements Initializable {
             }
         };
         errorWaiter.valueProperty().addListener((observable, oldMessage, newMessage) -> {
-            if(newMessage!=null && newMessage.getType() == Message.MessageType.ERROR){
+            if (newMessage != null && newMessage.getType() == Message.MessageType.ERROR) {
                 timeline.stop(); //ne poziva onFinished, jeeej
 //                this.communicationService.gameFinished();
                 this.showGameFinishedMessage(newMessage.getMessageText());
-            }else if(newMessage!=null && newMessage.getType() == Message.MessageType.EXCHANGE_ANSWERS){
-//                this.startErrorWaiter();
-                if(newMessage.getMessageText().equals("true")){
+            } else if (newMessage != null && newMessage.getType() == Message.MessageType.EXCHANGE_ANSWERS) {
+//                this.startMessageWaiter();
+                if (newMessage.getMessageText().equals("true")) {
                     this.isOpponentCorrect = true;
-                }else{
-                    this.isOpponentCorrect=false;
+                } else {
+                    this.isOpponentCorrect = false;
                 }
                 this.checkAnswers();
             }
@@ -199,7 +199,7 @@ public class TheChaseController implements Initializable {
                 }
             }
         }
-        if(showNextQuestion){
+        if (showNextQuestion) {
             this.showQuestion();
         }
     }
@@ -221,14 +221,8 @@ public class TheChaseController implements Initializable {
         this.gameFinished.setVisible(true);
     }
 
-    public void goBackOnMatchMakingScene(){
-        try {
-//            Message m = this.communicationService.waitForMessage();
-//            System.out.println("\n\n\n"+m);
-            this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void goBackOnMatchMakingScene() {
+        this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", this.answerOne.getScene(), false);
     }
 
     private void moveRunner() {
@@ -266,7 +260,7 @@ public class TheChaseController implements Initializable {
     private void timeIsUp() {
         this.isAnswerCorrect = false;
         this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
-        this.startErrorWaiter();
+        this.startMessageWaiter();
 //        boolean gameFinished = this.checkAnswers();
 //        if (gameFinished == false) {
 //            this.showQuestion();
@@ -275,9 +269,9 @@ public class TheChaseController implements Initializable {
 
     private void showQuestion() {
         ++currentQuestionIndex;
-        if(currentQuestionIndex == this.questions.length){
+        if (currentQuestionIndex == this.questions.length) {
             this.questions = this.communicationService.loadChaseQuestions();
-            currentQuestionIndex=0;
+            currentQuestionIndex = 0;
         }
         Question question = this.questions[currentQuestionIndex];
         this.loadQuestionText(question);
@@ -351,12 +345,10 @@ public class TheChaseController implements Initializable {
         }
     }
 
-    private void bindAnswerButtons(){
+    private void bindAnswerButtons() {
         this.answerOne.disableProperty().bind(Bindings.or(answerTwo.pressedProperty(), answerThree.pressedProperty()));
         this.answerTwo.disableProperty().bind(Bindings.or(answerOne.pressedProperty(), answerThree.pressedProperty()));
         this.answerThree.disableProperty().bind(Bindings.or(answerOne.pressedProperty(), answerTwo.pressedProperty()));
-
-
     }
 
 

@@ -1,10 +1,12 @@
 package com.rmt.services;
 
 import com.rmt.domain.Message;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
@@ -61,10 +63,10 @@ public class CommunicationService {
         return true;
     }
 
-    public boolean register(String username, String password) {
+    public boolean register(String username, String password) throws IOException {
 //      #TODO encript password before sending
+        this.sendMessage(Message.MessageType.REGISTER, username + "#" + password);
         try {
-            this.sendMessage(Message.MessageType.REGISTER, username + "#" + password);
             Message answer = (Message) this.serverInput.readObject();
             switch (answer.getType()) {
                 case ANSWERS: {
@@ -75,22 +77,18 @@ public class CommunicationService {
                 }
             }
         } catch (ClassNotFoundException e) {
-            return false;
-        } catch (IOException e1) {
-            return false;
+            e.printStackTrace();
         }
         return false;
     }
 
-    public String login(String username, String password) {
+    public String login(String username, String password) throws IOException {
 //      #TODO check whether username contains : or # before sending
         try {
             this.sendMessage(Message.MessageType.LOGIN, username + "#" + password);
             Message answer = (Message) this.serverInput.readObject();
             return answer.getMessageText();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -120,7 +118,8 @@ public class CommunicationService {
             Message answer = (Message) this.serverInput.readObject();
 
             if (answer.getType() == Message.MessageType.ANSWERS && answer.getMessageText().equals("YES")) {
-                this.sendMessage(GAME_ACCEPTED,opponentUsername);
+                this.sendMessage(GAME_ACCEPTED, opponentUsername);
+                System.out.println("Game accepted message sent from challengeOpponent");
                 return true;
             } else {
                 return false;
@@ -153,7 +152,6 @@ public class CommunicationService {
         }
     }
 
-
     public void challengeAccepted(String challengerUsername) {
         try {
             this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES\n" + challengerUsername);
@@ -174,11 +172,9 @@ public class CommunicationService {
         }
     }
 
-
     public void logout() {
         try {
             this.sendMessage(Message.MessageType.LOG_OUT, "");
-            System.out.println("Sent logout message");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -211,6 +207,7 @@ public class CommunicationService {
     public void tellServerToStartGame(String challengedUsername) {
         try {
             this.sendMessage(GAME_ACCEPTED, challengedUsername);
+            System.out.println("Game accepted message sent from tell server to...");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -218,7 +215,7 @@ public class CommunicationService {
 
     public void sendAnswers(int numberOfCorrectAnswers) {
         try {
-            this.sendMessage(SET_CORRECT_ANSWERS, numberOfCorrectAnswers+"");
+            this.sendMessage(SET_CORRECT_ANSWERS, numberOfCorrectAnswers + "");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -257,7 +254,7 @@ public class CommunicationService {
 
     public void sendChaseAnswer(boolean isAnswerCorrect) {
         try {
-            this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect+"");
+            this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect + "");
 //            boolean isOpponentCorrect;
 //            Message serverAnswer = (Message) this.serverInput.readObject();
 //            if(serverAnswer.getMessageText().equals("true")){
@@ -279,7 +276,7 @@ public class CommunicationService {
         }
     }
 
-    public Message waitForMessage(){
+    public Message waitForMessage() {
         try {
             Message message = (Message) this.serverInput.readObject();
             return message;

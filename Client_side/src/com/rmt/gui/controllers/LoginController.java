@@ -10,10 +10,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class LoginController implements Initializable {
@@ -57,40 +59,50 @@ public class LoginController implements Initializable {
         if (this.validatePassword(password) == false) {
             return;
         }
-        boolean registrationSuccessful = this.communicationService.register(username, password);
-        if (registrationSuccessful) {
-            try {
-                //this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", event);
-                this.stageService.changeToActivePlayersScene(event, username);
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            boolean registrationSuccessful = this.communicationService.register(username, password);
+            if (registrationSuccessful) {
+                try {
+                    //this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", event);
+                    this.stageService.changeToMatchmakingScene(event, username);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                this.invalidUsername.setText("Username already exists.");
             }
-        } else {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Registration failed");
-//            alert.setContentText("Username already exists.");
-//            alert.showAndWait();
-            this.invalidUsername.setText("Username already exists.");
+        } catch (IOException e) {
+            showErrorAlert();
+        }
+    }
+
+    private void showErrorAlert() {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle("Greska u komunikaciji sa serverom");
+        error.setContentText("Pokusajte ponovo.");
+        Optional<ButtonType> answer = error.showAndWait();
+        if(answer.get() == ButtonType.OK){
+            this.stageService.changeScene("com/rmt/gui/fxmls/startScene.fxml", this.loginButton.getScene(), false);
         }
     }
 
     public void onLoginButtonClicked(ActionEvent event) {
         String username = this.usernameField.getText();
         String password = this.passwordField.getText();
-        String answer = this.communicationService.login(username, password);
-        if (answer.equals("OK")) {
-            try {
-                this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", event);
-                //this.stageService.changeToActivePlayersScene(event, usernameField);
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            String answer = this.communicationService.login(username, password);
+            if (answer.equals("OK")) {
+                try {
+                    this.stageService.changeScene("com/rmt/gui/fxmls/matchMakingScene.fxml", event);
+                    //this.stageService.changeToMatchmakingScene(event, usernameField);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                this.setIncorrectInfoStyle();
             }
-        } else {
-//            Alert alert = new Alert(Alert.AlertType.ERROR);
-//            alert.setTitle("Login failed");
-//            alert.setContentText(answer);
-//            alert.showAndWait();
-            this.setIncorrectInfoStyle();
+        } catch (IOException e) {
+            this.showErrorAlert();
         }
     }
 
@@ -138,14 +150,13 @@ public class LoginController implements Initializable {
         boolean tooShort = username.length() < 3;
         boolean tooLong = username.length() > 10;
 
-        if (tooShort){
+        if (tooShort) {
             this.invalidUsername.setText("Username is too short.");
             this.usernameField.getStyleClass().add("incorrect-info");
-        }
-        else if (tooLong) {
+        } else if (tooLong) {
             this.invalidUsername.setText("Username is too long.");
             this.usernameField.getStyleClass().add("incorrect-info");
-        } else{
+        } else {
             this.invalidUsername.setText("");
             this.usernameField.getStyleClass().removeAll("incorrect-info");
         }

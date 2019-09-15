@@ -422,12 +422,6 @@
       ],
       "questionText": "Šta od ponuđenog predstavlja framework?",
       "correctAnswer": "Bootstrap"
-    },
-    {
-      "possibleAnswers": [
-        "printf(\"%d\",br);",
-        "printf(\"%d\",\u0026br);",
-        "scanf(\"%d\",\u0026br);"]
     }
     ],
   "ChaseQuestions": [
