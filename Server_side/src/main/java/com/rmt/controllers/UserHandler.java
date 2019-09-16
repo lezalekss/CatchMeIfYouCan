@@ -309,7 +309,7 @@ public class UserHandler extends Thread {
             return;
         }
         this.sendAnswer("OK");
-//        dbConn.insertIntoDatabase(userAndPass[0], userAndPass[1]);
+        dbConn.insertIntoDatabase(userAndPass[0], userAndPass[1]);
         user.setUsername(userAndPass[0]);
         user.setStatus(Player.PlayerStatus.OFFLINE);
         ServerAppMain.addToOfflinePlayers(user);

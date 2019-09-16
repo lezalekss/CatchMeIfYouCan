@@ -10,15 +10,15 @@ public final class DBConnection {
     private Connection connection;
     private Logger logger = Logger.getLogger(ServerAppMain.class.getName());
     public DBConnection(){
-//        try{
-//            logger.info("Trying to setup connection with database");
-//            Class.forName("oracle.jdbc.driver.OracleDriver");
-//            connection= DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/xepdb1", "catchmeifyoucan", "catchmeifyoucan!");
-//        } catch (ClassNotFoundException e) {
-//           e.printStackTrace();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
+        try{
+            logger.info("Trying to setup connection with database");
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            connection= DriverManager.getConnection("jdbc:oracle:thin:@//localhost:1521/xepdb1", "catchmeifyoucan", "catchmeifyoucan!");
+        } catch (ClassNotFoundException e) {
+           e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     public void insertIntoDatabase(String user, String pass){
         try{
@@ -31,17 +31,17 @@ public final class DBConnection {
     }
 
     public boolean isRegistered(String username){
-//        try{
-//            Statement stmt = (Statement)connection.createStatement();
-//            ResultSet rs = stmt.executeQuery("SELECT username FROM users");
-//
-//            while (rs.next())
-//                if(username.equals(rs.getString(1)))
-//                    return true;
-//            stmt.close();
-//        }catch(SQLException e){
-//            e.printStackTrace();
-//        }
+        try{
+            Statement stmt = (Statement)connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT username FROM users");
+
+            while (rs.next())
+                if(username.equals(rs.getString(1)))
+                    return true;
+            stmt.close();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
         return false;
     }
 
