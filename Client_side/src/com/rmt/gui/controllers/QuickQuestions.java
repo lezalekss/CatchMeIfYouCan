@@ -17,6 +17,8 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.ImageView;
@@ -73,7 +75,12 @@ public class QuickQuestions implements Initializable {
         this.questionText.setFocusTraversable(false);
         this.questionText.setMouseTransparent(true);
 
-        this.questions = communicationService.loadQuickQuestions();
+        try {
+            this.questions = communicationService.loadQuickQuestions();
+        } catch (IOException e) {
+            this.timer.stop();
+            this.showErrorAlert();
+        }
 //        this.setTestQuestions();
         this.displayQuestion();
         this.startTimer(secondsForAnswering);
@@ -82,7 +89,15 @@ public class QuickQuestions implements Initializable {
 
     private void startTimer(int seconds) {
         this.timer = new PauseTransition(Duration.seconds(seconds));
-        timer.setOnFinished(event -> this.communicationService.sendAnswers(this.numberOfCorrectAnswers));
+        timer.setOnFinished(event -> {
+            try {
+                System.out.println("istekao tajmer");
+                this.communicationService.sendAnswers(this.numberOfCorrectAnswers);
+            } catch (IOException e) {
+                System.out.println("exception u istekao timer i salje tacne odg");
+                this.showErrorAlert();
+            }
+        });
         timer.playFromStart();
     }
 
@@ -90,10 +105,21 @@ public class QuickQuestions implements Initializable {
         Task<String> errorWaiter = new Task<String>() {
             @Override
             protected String call() {
-                Message message = communicationService.waitForMessage();
+                Message message = null;
+                try {
+                    message = communicationService.waitForMessage();
+                } catch (IOException e) {
+                    timer.stop();
+                    showErrorAlert();
+                }
                 if (message.getType() == Message.MessageType.ERROR) {
                     timer.stop();
-                    communicationService.sendAnswers(-1);
+                    try {
+                        communicationService.sendAnswers(-1);
+                    } catch (IOException e) {
+                        timer.stop();
+                        showErrorAlert();
+                    }
 //                    System.out.println(message.getType()+" "+message.getMessageText());
                     return message.getMessageText();
                 } else if (message.getType() == Message.MessageType.ANSWERS) {
@@ -144,7 +170,12 @@ public class QuickQuestions implements Initializable {
 
     private void displayQuestion() {
         if (currentQuestionIndex == this.questions.length) {
-            this.questions = this.communicationService.loadQuickQuestions();
+            try {
+                this.questions = this.communicationService.loadQuickQuestions();
+            } catch (IOException e) {
+                this.timer.stop();
+                this.showErrorAlert();
+            }
             currentQuestionIndex = 0;
         }
 
@@ -187,19 +218,13 @@ public class QuickQuestions implements Initializable {
         this.answerFour.setText(answers.get(3));
     }
 
-//    private void setTestQuestions(){
-//        this.questions= new Question[100];
-//        for (int i=0;i<100;i++) {
-//            questions[i] = new Question();
-//            questions[i].setQuestionText("pitanje "+i);
-//            questions[i].setCorrectAnswer("odg 3");
-//            String[] pa = new String[4];
-//            pa[0] = "ponudjeni odg 1";
-//            pa[1] = "ponudjeni odg 2";
-//            pa[2] = "ponudjeni odg 3";
-//            pa[3] = "ponudjeni odg 4";
-//            questions[i].setPossibleAnswers(pa);
-//            questions[i].setCorrectAnswer("ponudjeni odg 1");
-//        }
-//    }
+    private void showErrorAlert() {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle("Greska u komunikaciji sa serverom");
+        error.setContentText("Pokusajte ponovo.");
+        Optional<ButtonType> answer = error.showAndWait();
+        if (answer.get() == ButtonType.OK) {
+            this.stageService.changeScene("com/rmt/gui/fxmls/startScene.fxml", this.gameFinished.getScene(), false);
+        }
+    }
 }

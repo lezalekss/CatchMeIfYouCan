@@ -37,13 +37,11 @@ public class CommunicationService {
         return serviceInstance;
     }
 
-    public Question[] loadQuickQuestions() {
+    public Question[] loadQuickQuestions() throws IOException {
         try {
             this.sendMessage(GET_QUICK_QUESTIONS, "");
             Question[] quickQuestions = (Question[]) this.serverInput.readObject();
             return quickQuestions;
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -99,19 +97,17 @@ public class CommunicationService {
         this.serverOutput.writeObject(message);
     }
 
-    public Set<String> getActivePlayers() {
+    public Set<String> getActivePlayers() throws IOException {
         try {
             this.sendMessage(Message.MessageType.GET_ACTIVE, "");
             return (Set<String>) this.serverInput.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public boolean challengeOpponent(String opponentUsername) {
+    public boolean challengeOpponent(String opponentUsername) throws IOException {
         try {
             this.sendMessage(Message.MessageType.PLAY_WITH, opponentUsername);
 
@@ -124,8 +120,6 @@ public class CommunicationService {
             } else {
                 return false;
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -133,7 +127,7 @@ public class CommunicationService {
         return false;
     }
 
-    public void updatePlayers(ObservableSet<String> players) {
+    public void updatePlayers(ObservableSet<String> players) throws IOException {
         try {
             serverInputLock.readLock().lock();
             try {
@@ -147,53 +141,29 @@ public class CommunicationService {
             }
         } catch (ClassNotFoundException e) {
 
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
-    public void challengeAccepted(String challengerUsername) {
-        try {
-            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES\n" + challengerUsername);
-            this.serverOutput.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void challengeAccepted(String challengerUsername) throws IOException {
+        this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "YES\n" + challengerUsername);
+        this.serverOutput.flush();
     }
 
-    public void challengeRejected(String challengerUsername) {
-        try {
-            this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "NO\n" + challengerUsername);
-            this.serverOutput.flush();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void challengeRejected(String challengerUsername) throws IOException {
+        this.sendMessage(Message.MessageType.CHALLENGE_ANSWER, "NO\n" + challengerUsername);
+        this.serverOutput.flush();
     }
 
-    public void logout() {
-        try {
-            this.sendMessage(Message.MessageType.LOG_OUT, "");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void logout() throws IOException {
+        this.sendMessage(Message.MessageType.LOG_OUT, "");
     }
 
-    public void tellServerToSwitchToWaiting() {
-        try {
-            this.sendMessage(Message.MessageType.SWITCH, "TO WAITING");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void tellServerToSwitchToWaiting() throws IOException {
+        this.sendMessage(Message.MessageType.SWITCH, "TO WAITING");
     }
 
-    public void tellServerToSwitchToChallenging() {
-        try {
-            this.sendMessage(Message.MessageType.SWITCH, "TO CHALLENGING");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void tellServerToSwitchToChallenging() throws IOException {
+        this.sendMessage(Message.MessageType.SWITCH, "TO CHALLENGING");
     }
 
     public void startWaitingTask(WaitingTask waitingTask) {
@@ -204,84 +174,32 @@ public class CommunicationService {
         thread.start();
     }
 
-    public void tellServerToStartGame(String challengedUsername) {
-        try {
-            this.sendMessage(GAME_ACCEPTED, challengedUsername);
-            System.out.println("Game accepted message sent from tell server to...");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void sendAnswers(int numberOfCorrectAnswers) throws IOException {
+        this.sendMessage(SET_CORRECT_ANSWERS, numberOfCorrectAnswers + "");
     }
 
-    public void sendAnswers(int numberOfCorrectAnswers) {
-        try {
-            this.sendMessage(SET_CORRECT_ANSWERS, numberOfCorrectAnswers + "");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public Question[] loadChaseQuestions() {
+    public Question[] loadChaseQuestions() throws IOException {
         try {
             this.sendMessage(GET_CHASE_QUESTIONS, "");
             return (Question[]) this.serverInput.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-//    public boolean sendChaseAnswer(boolean isAnswerCorrect) {
-//        try {
-//            this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect+"");
-//            boolean isOpponentCorrect;
-//            Message serverAnswer = (Message) this.serverInput.readObject();
-//            if(serverAnswer.getMessageText().equals("true")){
-//                isOpponentCorrect = true;
-//            }else {
-//                isOpponentCorrect = false;
-//            }
-//            return isOpponentCorrect;
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        return false;
-//    }
-
-    public void sendChaseAnswer(boolean isAnswerCorrect) {
-        try {
-            this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect + "");
-//            boolean isOpponentCorrect;
-//            Message serverAnswer = (Message) this.serverInput.readObject();
-//            if(serverAnswer.getMessageText().equals("true")){
-//                isOpponentCorrect = true;
-//            }else {
-//                isOpponentCorrect = false;
-//            }
-//            return isOpponentCorrect;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void sendChaseAnswer(boolean isAnswerCorrect) throws IOException {
+        this.sendMessage(EXCHANGE_ANSWERS, isAnswerCorrect + "");
     }
 
-    public void gameFinished() {
-        try {
-            this.sendMessage(GAME_FINISHED, "");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void gameFinished() throws IOException {
+        this.sendMessage(GAME_FINISHED, "");
     }
 
-    public Message waitForMessage() {
+    public Message waitForMessage() throws IOException {
         try {
             Message message = (Message) this.serverInput.readObject();
             return message;
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }

@@ -42,7 +42,6 @@ public class UserHandler extends Thread {
 
             while (true) {
                 Message msg = (Message) userInput.readObject();
-                System.out.println(user.getUsername() + " UH u velikom while-u " + msg);
                 switch (msg.getType()) {
                     case LOGIN:
                         this.login(msg);
@@ -103,7 +102,6 @@ public class UserHandler extends Thread {
                         }
                     }
                     case GAME_ACCEPTED: {
-                        System.out.println(user.getUsername() + "' UH is in game accepted case " + msg);
                         //starts method for game managing for challenger, message text is challenged username
                         this.opponentUsername = msg.getMessageText();
                         this.opponentOutputStream = ServerAppMain.findOfflinePlayer(opponentUsername).getUserOutput();
@@ -157,7 +155,6 @@ public class UserHandler extends Thread {
     private void startGame(String usernames, boolean isThisChallenger) {
         // startovanje prve igre
         this.gamePair = GameHandler.addPairToMap(usernames);
-        System.out.println("UH: Game started and pair created\n");
         try {
             while (true) {
                 Message msg = (Message) this.userInput.readObject();
@@ -198,14 +195,12 @@ public class UserHandler extends Thread {
                         break;
                     }
                     case EXCHANGE_ANSWERS: {
-                        System.out.println(user.getUsername() + " Exchange answers received " + msg);
                         this.opponentOutputStream.writeObject(msg);
                         break;
                     }
                     case GAME_FINISHED:
                         return;
                     default:
-                        System.out.println(msg);
                 }
             }
         } catch (EOFException e) {

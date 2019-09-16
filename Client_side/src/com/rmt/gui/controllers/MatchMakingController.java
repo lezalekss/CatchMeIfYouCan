@@ -49,7 +49,12 @@ public class MatchMakingController implements Initializable {
         this.switchButton.setText("SWITCH TO WAITING");
 //        challenging.setDisable(true);
 
-        Set<String> receivedPlayers = this.communicationService.getActivePlayers();
+        Set<String> receivedPlayers = null;
+        try {
+            receivedPlayers = this.communicationService.getActivePlayers();
+        } catch (IOException e) {
+            this.showErrorAlert();
+        }
 
         if (receivedPlayers.size() >= 0) {
 
@@ -75,7 +80,12 @@ public class MatchMakingController implements Initializable {
                 Alert alert = this.createAlert(Alert.AlertType.CONFIRMATION, "Da li zelite da izazovete " + opponentUsername + "?");
                 Optional<ButtonType> answer = alert.showAndWait();
                 if (answer.get() == ButtonType.OK) {
-                    boolean challengeSuccessful = this.communicationService.challengeOpponent(opponentUsername);
+                    boolean challengeSuccessful = false;
+                    try {
+                        challengeSuccessful = this.communicationService.challengeOpponent(opponentUsername);
+                    } catch (IOException e) {
+                        this.showErrorAlert();
+                    }
                     if (challengeSuccessful == false) {
                         alert = this.createAlert(Alert.AlertType.ERROR, newValue.toString() + "vise nije aktivan ili je odbio poziv");
                         alert.showAndWait();
@@ -83,7 +93,7 @@ public class MatchMakingController implements Initializable {
 //                        this.onRefreshButtonClicked();
                         return;
                     } else {
-                            this.stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
+                        this.stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
 
                     }
                 } else {
@@ -106,7 +116,11 @@ public class MatchMakingController implements Initializable {
         if (this.switchButton.getText().equals("SWITCH TO WAITING")) {
             this.waitForChallenge();
 
-            this.communicationService.tellServerToSwitchToWaiting();
+            try {
+                this.communicationService.tellServerToSwitchToWaiting();
+            } catch (IOException e) {
+                this.showErrorAlert();
+            }
 
             this.resetButtonForWaitingState();
 
@@ -114,7 +128,11 @@ public class MatchMakingController implements Initializable {
 
         } else if (this.switchButton.getText().equals("SWITCH TO CHALLENGING")) {
 
-            this.communicationService.tellServerToSwitchToChallenging();
+            try {
+                this.communicationService.tellServerToSwitchToChallenging();
+            } catch (IOException e) {
+                this.showErrorAlert();
+            }
 
             this.switchButton.setText("SWITCH TO WAITING");
         }
@@ -155,13 +173,17 @@ public class MatchMakingController implements Initializable {
 
         boolean accepted = this.showChallengeReceivingDialog(this.challengerUsername);
 
-        if (accepted) {
-            this.communicationService.challengeAccepted(this.challengerUsername);
+        try {
+            if (accepted) {
+                this.communicationService.challengeAccepted(this.challengerUsername);
                 stageService.changeScene("com/rmt/gui/fxmls/quickQuestions.fxml", refreshButton.getScene(), false);
-        } else {
-            this.communicationService.challengeRejected(this.challengerUsername);
+            } else {
+                this.communicationService.challengeRejected(this.challengerUsername);
 
-            this.waitForChallenge();
+                this.waitForChallenge();
+            }
+        } catch (IOException e) {
+            this.showErrorAlert();
         }
     }
 
@@ -197,12 +219,25 @@ public class MatchMakingController implements Initializable {
     }
 
     public void onRefreshButtonClicked() {
-        this.communicationService.updatePlayers(activePlayersSet);
+        try {
+            this.communicationService.updatePlayers(activePlayersSet);
+        } catch (IOException e) {
+            this.showErrorAlert();
+        }
     }
 
     public void setUsername(String username) {
         this.username = username;
     }
 
+    private void showErrorAlert() {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle("Greska u komunikaciji sa serverom");
+        error.setContentText("Pokusajte ponovo.");
+        Optional<ButtonType> answer = error.showAndWait();
+        if (answer.get() == ButtonType.OK) {
+            this.stageService.changeScene("com/rmt/gui/fxmls/startScene.fxml", this.activePlayersListView.getScene(), false);
+        }
+    }
 
 }

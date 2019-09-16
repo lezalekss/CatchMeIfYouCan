@@ -18,18 +18,13 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class TheChaseController implements Initializable {
 
@@ -108,7 +103,12 @@ public class TheChaseController implements Initializable {
         this.timerLabel.textProperty().bind(this.timeSeconds.asString());
 
 //        this.setTestQuestions();
-        this.questions = this.communicationService.loadChaseQuestions();
+        try {
+            this.questions = this.communicationService.loadChaseQuestions();
+        } catch (IOException e) {
+            this.timeline.stop();
+            this.showErrorAlert();
+        }
         this.showQuestion();
     }
 
@@ -123,7 +123,12 @@ public class TheChaseController implements Initializable {
         this.progressIndicator.setVisible(true);
 
         this.isAnswerCorrect = this.questions[currentQuestionIndex].getCorrectAnswer().equals(chosenAnswer);
-        this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
+        try {
+            this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
+        } catch (IOException e) {
+            this.timeline.stop();
+            this.showErrorAlert();
+        }
         this.startMessageWaiter();
 
 //        boolean gameFinished = this.checkAnswers(chosenAnswer);
@@ -137,7 +142,13 @@ public class TheChaseController implements Initializable {
         Task<Message> errorWaiter = new Task<Message>() {
             @Override
             protected Message call() {
-                Message message = communicationService.waitForMessage();
+                Message message = null;
+                try {
+                    message = communicationService.waitForMessage();
+                } catch (IOException e) {
+                    timeline.stop();
+                    showErrorAlert();
+                }
                 System.out.println(message);
                 return message;
             }
@@ -168,7 +179,12 @@ public class TheChaseController implements Initializable {
             if (this.isAnswerCorrect) {
                 this.moveRunner();
                 if (runnerPossition == 8) {
-                    this.communicationService.gameFinished();
+                    try {
+                        this.communicationService.gameFinished();
+                    } catch (IOException e) {
+                        this.timeline.stop();
+                        this.showErrorAlert();
+                    }
                     this.showGameFinishedMessage("Congratulations! You escaped!");
                     showNextQuestion = false;
                 }
@@ -176,7 +192,12 @@ public class TheChaseController implements Initializable {
             if (this.isOpponentCorrect) {
                 moveChaser();
                 if (runnerPossition == chaserPossition) {
-                    this.communicationService.gameFinished();
+                    try {
+                        this.communicationService.gameFinished();
+                    } catch (IOException e) {
+                        this.timeline.stop();
+                        this.showErrorAlert();
+                    }
                     this.showGameFinishedMessage("Sorry, the chaser got you.");
                     showNextQuestion = false;
                 }
@@ -185,7 +206,12 @@ public class TheChaseController implements Initializable {
             if (this.isOpponentCorrect) {
                 this.moveRunner();
                 if (runnerPossition == 8) {
-                    this.communicationService.gameFinished();
+                    try {
+                        this.communicationService.gameFinished();
+                    } catch (IOException e) {
+                        this.timeline.stop();
+                        this.showErrorAlert();
+                    }
                     this.showGameFinishedMessage("Sorry, the runner escaped.");
                     showNextQuestion = false;
                 }
@@ -193,7 +219,12 @@ public class TheChaseController implements Initializable {
             if (this.isAnswerCorrect) {
                 moveChaser();
                 if (runnerPossition == chaserPossition) {
-                    this.communicationService.gameFinished();
+                    try {
+                        this.communicationService.gameFinished();
+                    } catch (IOException e) {
+                        this.timeline.stop();
+                        this.showErrorAlert();
+                    }
                     this.showGameFinishedMessage("Congratulations! You caught the runner!");
                     showNextQuestion = false;
                 }
@@ -259,7 +290,12 @@ public class TheChaseController implements Initializable {
 
     private void timeIsUp() {
         this.isAnswerCorrect = false;
-        this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
+        try {
+            this.communicationService.sendChaseAnswer(this.isAnswerCorrect);
+        } catch (IOException e) {
+            this.timeline.stop();
+            this.showErrorAlert();
+        }
         this.startMessageWaiter();
 //        boolean gameFinished = this.checkAnswers();
 //        if (gameFinished == false) {
@@ -270,7 +306,12 @@ public class TheChaseController implements Initializable {
     private void showQuestion() {
         ++currentQuestionIndex;
         if (currentQuestionIndex == this.questions.length) {
-            this.questions = this.communicationService.loadChaseQuestions();
+            try {
+                this.questions = this.communicationService.loadChaseQuestions();
+            } catch (IOException e) {
+                this.timeline.stop();
+                this.showErrorAlert();
+            }
             currentQuestionIndex = 0;
         }
         Question question = this.questions[currentQuestionIndex];
@@ -351,19 +392,13 @@ public class TheChaseController implements Initializable {
         this.answerThree.disableProperty().bind(Bindings.or(answerOne.pressedProperty(), answerTwo.pressedProperty()));
     }
 
-
-//    private void setTestQuestions() {
-//        this.questions = new Question[100];
-//        for (int i = 0; i < 100; i++) {
-//            questions[i] = new Question();
-//            questions[i].setQuestionText("Tekst dugog pitanja na koje ne znamo odgovor " + i);
-//            String[] pa = new String[4];
-//            pa[0] = "odg 1";
-//            pa[1] = "odg 2";
-//            pa[2] = "odg 3";
-//            pa[3] = "odg 4";
-//            questions[i].setPossibleAnswers(pa);
-//            questions[i].setCorrectAnswer("ponudjeni odg 1");
-//        }
-//    }
+    private void showErrorAlert() {
+        Alert error = new Alert(Alert.AlertType.ERROR);
+        error.setTitle("Greska u komunikaciji sa serverom");
+        error.setContentText("Pokusajte ponovo.");
+        Optional<ButtonType> answer = error.showAndWait();
+        if (answer.get() == ButtonType.OK) {
+            this.stageService.changeScene("com/rmt/gui/fxmls/startScene.fxml", this.progressIndicator.getScene(), false);
+        }
+    }
 }
